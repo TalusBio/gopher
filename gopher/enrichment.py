@@ -4,6 +4,7 @@ import logging
 import pandas as pd
 from scipy import stats
 from statsmodels.stats import multitest
+from tqdm.auto import tqdm
 
 from .annotations import load_annotations
 
@@ -17,6 +18,7 @@ def test_enrichment(
     species="human",
     release="current",
     fetch=False,
+    progress=True,
 ):
     """Test for the enrichment of Gene Ontology terms from protein abundance.
 
@@ -61,20 +63,25 @@ def test_enrichment(
         fetch=fetch,
     )
 
-    accessions = pd.DataFrame(proteins.index, columns=["uniprot_accession"])
+    accessions = pd.DataFrame(
+        list(proteins.index),
+        columns=["uniprot_accession"],
+    )
     annot = accessions.merge(annot, how="inner")
-
     n_prot = proteins.shape[1]
     proteins = pd.DataFrame(proteins).loc[annot["uniprot_accession"], :]
     lost = n_prot - proteins.shape[1]
     if lost:
-        LOGGER.info("%i proteins not found in GO annotations.", lost)
+        LOGGER.warning("%i proteins not found in GO annotations.", lost)
 
     if not desc:
         proteins = -proteins
 
     results = []
-    for term, accessions in annot.groupby(["go_id", "go_name", "aspect"]):
+    grp_cols = ["go_id", "go_name", "aspect"]
+    for term, accessions in tqdm(
+        annot.groupby(grp_cols), disable=not progress
+    ):
         in_term = proteins.index.isin(accessions["uniprot_accession"])
         in_vals = proteins[in_term].values
         out_vals = proteins[~in_term].values
@@ -83,7 +90,6 @@ def test_enrichment(
 
     cols = ["GO Accession", "GO Name", "GO Aspect"] + list(proteins.columns)
     results = pd.DataFrame(results, columns=cols)
-
     results.loc[:, proteins.columns] = results.loc[:, proteins.columns].apply(
         adjust_pvals, raw=True
     )

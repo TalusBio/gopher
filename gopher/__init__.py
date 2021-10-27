@@ -16,4 +16,5 @@ except ImportError:
         pass
 
 from .config import get_data_dir, set_data_dir
-from .annotations import load_annotations
+from .parsers import read_encyclopedia
+from .enrichment import test_enrichment
