@@ -30,9 +30,7 @@ class GopherConfig:
         if path is None:
             try:
                 path = (
-                    Path(os.environ["GOPHER_DATA_DIR"])
-                    .expanduser()
-                    .resolve()
+                    Path(os.environ["GOPHER_DATA_DIR"]).expanduser().resolve()
                 )
                 if not path.exists():
                     raise FileNotFoundError(

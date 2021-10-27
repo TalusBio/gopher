@@ -1,6 +1,4 @@
 """Get GO annotations."""
-import socket
-
 import requests
 import pandas as pd
 
@@ -84,7 +82,7 @@ def load_annotations(species, aspect="c", release="current", fetch=False):
 
     cols = [
         "db",
-        "db_object_id",
+        "uniprot_accession",
         "db_object_symbol",
         "qualifier",
         "go_id",
@@ -113,11 +111,13 @@ def load_annotations(species, aspect="c", release="current", fetch=False):
         low_memory=False,
     )
     annot = annot.loc[annot["aspect"] == aspect.upper(), :]
-    annot["go_name"] = annot["go_id"].replace(terms)
-    annot["uniprot_accession"] = (
-        annot["gene_product_form_id"]
-        .str.split(":", expand=True)[1]
-    )
+    uniprot = annot["db"] == "UniProtKB"
+    if not uniprot.all():
+        annot.loc[~uniprot, "uniprot_accession"] = annot.loc[
+            ~uniprot, "gene_product_form_id"
+        ].str.extract(r"UniProtKB:(.+)", expand=False)
 
-    keep = ["uniprot_accession", "go_id", "go_name", "aspect"]
-    return annot.loc[:, keep]
+    keep = ["uniprot_accession", "go_id", "aspect"]
+    annot = annot.loc[:, keep].drop_duplicates()
+    annot["go_name"] = annot["go_id"].map(terms)
+    return annot

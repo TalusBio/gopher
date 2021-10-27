@@ -16,6 +16,7 @@ def _get_version():
     try:
         # Fast, but only works in Python 3.8+
         from importlib.metadata import version, PackageNotFoundError
+
         try:
             return version("gopher-enrich")
         except PackageNotFoundError:
@@ -24,6 +25,7 @@ def _get_version():
     except ImportError:
         # Slow, but works for all Python 3+
         from pkg_resources import get_distribution, DistributionNotFound
+
         try:
             return get_distribution("gopher-enrich").version
         except DistributionNotFound:
