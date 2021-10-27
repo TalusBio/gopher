@@ -50,7 +50,7 @@ def download_annotations(stem, release="current", fetch=False):
     return out_file
 
 
-def load_annotations(species, aspect="c", release="current", fetch=False):
+def load_annotations(species, aspect=None, release="current", fetch=False):
     """Load the Gene Ontology (GO) annotations for a species.
 
     Parameters
@@ -75,7 +75,8 @@ def load_annotations(species, aspect="c", release="current", fetch=False):
         A mapping of GO terms (keys) to Uniprot accessions with that
         annotation.
     """
-    if aspect.lower() not in {"c", "f", "p", None}:
+    aspect = None if aspect is None else aspect.upper()
+    if aspect not in {"C", "F", "P", None}:
         raise ValueError(
             f"Expected apsect ({aspect}) to be one of 'c', 'f', 'p', or None."
         )
@@ -110,7 +111,10 @@ def load_annotations(species, aspect="c", release="current", fetch=False):
         names=cols,
         low_memory=False,
     )
-    annot = annot.loc[annot["aspect"] == aspect.upper(), :]
+
+    if aspect is not None:
+        annot = annot.loc[annot["aspect"] == aspect, :]
+
     uniprot = annot["db"] == "UniProtKB"
     if not uniprot.all():
         annot.loc[~uniprot, "uniprot_accession"] = annot.loc[
