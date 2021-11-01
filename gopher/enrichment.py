@@ -14,7 +14,7 @@ LOGGER = logging.getLogger(__name__)
 def test_enrichment(
     proteins,
     desc=True,
-    aspect=None,
+    aspect="all",
     species="human",
     release="current",
     fetch=False,
@@ -37,12 +37,12 @@ def test_enrichment(
         the difference between two conditions.
     desc : bool, optional
         Rank proteins in descending order?
-    aspect : str, {"c", "f", "p"} or None, optional
-        The Gene Ontology aspect to use. Use "c" for "Cellular Compartment",
-        "f" for "Molecular Function", or "p" for "Biological Process". ``None``
-        uses all of the them.
+    aspect : str, {"cc", "mf", "bp", "all"}, optional
+        The Gene Ontology aspect to use. Use "cc" for "Cellular Compartment",
+        "mf" for "Molecular Function", "bp" for "Biological Process", or "all"
+        for all three.
     species : str, {"human", "yeast", ...}, optional.
-        The species for which to retrieve GO annotations. If not "humnan" or
+        The species for which to retrieve GO annotations. If not "human" or
         "yeast", see
         [here](http://current.geneontology.org/products/pages/downloads.html).
     release : str, optional
@@ -50,12 +50,15 @@ def test_enrichment(
         most current version.
     fetch : bool, optional
         Download the annotations even if the file already exists?
+    progress : bool, optional
+        Show a progress bar?
 
     Returns
     -------
     pandas.DataFrame
         The adjusted p-value for each tested GO term in each sample.
     """
+    LOGGER.info("Retrieving GO annotations...")
     annot = load_annotations(
         species=species,
         aspect=aspect,
@@ -79,6 +82,8 @@ def test_enrichment(
 
     results = []
     grp_cols = ["go_id", "go_name", "aspect"]
+
+    LOGGER.info("Testing enrichment...")
     for term, accessions in tqdm(
         annot.groupby(grp_cols), disable=not progress
     ):
