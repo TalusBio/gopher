@@ -18,6 +18,7 @@ def test_enrichment(
     species="human",
     release="current",
     fetch=False,
+    go_filters=None,
     progress=True,
 ):
     """Test for the enrichment of Gene Ontology terms from protein abundance.
@@ -48,6 +49,9 @@ def test_enrichment(
     release : str, optional
         The Gene Ontology release version. Using "current" will look up the
         most current version.
+    go_filters: List[str], optional
+        The go terms of interest. Should consists of the go term names such
+        as 'nucleus' or 'cytoplasm'.
     fetch : bool, optional
         Download the annotations even if the file already exists?
     progress : bool, optional
@@ -65,6 +69,9 @@ def test_enrichment(
         release=release,
         fetch=fetch,
     )
+
+    if go_filters:
+        annot = annot[annot["go_name"].isin(go_filters)]
 
     accessions = pd.DataFrame(
         list(proteins.index),
@@ -87,11 +94,11 @@ def test_enrichment(
     for term, accessions in tqdm(
         annot.groupby(grp_cols), disable=not progress
     ):
-        in_term = proteins.index.isin(accessions["uniprot_accession"])
+        in_term = proteins.index.isin(accessions["uniprot_accession"].unique())
         in_vals = proteins[in_term].values
         out_vals = proteins[~in_term].values
         res = stats.mannwhitneyu(in_vals, out_vals, alternative="greater")
-        results.append(list(term) + [res[1]])
+        results.append(list(term) + list(res[1]))
 
     cols = ["GO Accession", "GO Name", "GO Aspect"] + list(proteins.columns)
     results = pd.DataFrame(results, columns=cols)
