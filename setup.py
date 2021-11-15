@@ -2,7 +2,7 @@
 import setuptools
 
 package_data = {
-    "static": ["gopher/fasta/*.fasta"],
+    "fasta": ["*.fasta"],
 }
 
 setuptools.setup()
