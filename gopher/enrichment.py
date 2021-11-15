@@ -82,9 +82,21 @@ def test_enrichment(
         columns=["uniprot_accession"],
     )
     if filter_contaminants:
-        contaminants_fasta = SeqIO.parse(open(Path(__file__).resolve().parent.joinpath("fasta/contaminants.fasta")), "fasta")
-        contaminant_uids = [re.search(f"\|(.+?)\|", seq.id).group(1) for seq in contaminants_fasta]
-        accessions = accessions[~accessions["uniprot_accession"].isin(contaminant_uids)]
+        contaminants_fasta = SeqIO.parse(
+            open(
+                Path(__file__)
+                .resolve()
+                .parent.joinpath("fasta/contaminants.fasta")
+            ),
+            "fasta",
+        )
+        contaminant_uids = [
+            re.search(f"\|(.+?)\|", seq.id).group(1)
+            for seq in contaminants_fasta
+        ]
+        accessions = accessions[
+            ~accessions["uniprot_accession"].isin(contaminant_uids)
+        ]
 
     annot = accessions.merge(annot, how="inner")
     n_prot = proteins.shape[1]

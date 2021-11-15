@@ -2,7 +2,7 @@
 import setuptools
 
 setuptools.setup(
-    package_data = {
+    package_data={
         "": ["*.fasta"],
     }
 )
