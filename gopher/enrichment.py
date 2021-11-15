@@ -1,6 +1,9 @@
 """Calculate the enrichments for a collection of experiments."""
 import logging
+import re
+from pathlib import Path
 
+from Bio import SeqIO
 import pandas as pd
 from scipy import stats
 from statsmodels.stats import multitest
@@ -19,6 +22,7 @@ def test_enrichment(
     release="current",
     fetch=False,
     go_filters=None,
+    filter_contaminants=False,
     progress=True,
 ):
     """Test for the enrichment of Gene Ontology terms from protein abundance.
@@ -52,6 +56,9 @@ def test_enrichment(
     go_filters: List[str], optional
         The go terms of interest. Should consists of the go term names such
         as 'nucleus' or 'cytoplasm'.
+    filter_contaminants: bool, optional
+        Whether we want to filter out the accessions of common contaminants such as
+        Keratin. See `gopher/fasta/contaminants.fasta` for details.
     fetch : bool, optional
         Download the annotations even if the file already exists?
 
@@ -74,6 +81,11 @@ def test_enrichment(
         list(proteins.index),
         columns=["uniprot_accession"],
     )
+    if filter_contaminants:
+        contaminants_fasta = SeqIO.parse(open(Path(__file__).resolve().parent.joinpath("fasta/contaminants.fasta"), "fasta"))
+        contaminant_uids = [re.search(f"\|(.+?)\|", seq.id).group(1) for seq in contaminants_fasta]
+        accessions = accessions[~accessions["uniprot_accession"].isin(contaminant_uids)]
+
     annot = accessions.merge(annot, how="inner")
     n_prot = proteins.shape[1]
     proteins = pd.DataFrame(proteins).loc[annot["uniprot_accession"], :]
