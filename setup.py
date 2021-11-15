@@ -1,8 +1,8 @@
 """Setup ppx"""
 import setuptools
 
-package_data = {
-    "fasta": ["*.fasta"],
-}
-
-setuptools.setup()
+setuptools.setup(
+    package_data = {
+        "": ["*.fasta"],
+    }
+)
