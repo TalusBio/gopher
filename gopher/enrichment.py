@@ -1,9 +1,6 @@
 """Calculate the enrichments for a collection of experiments."""
 import logging
-import re
-from pathlib import Path
 
-from Bio import SeqIO
 import pandas as pd
 from scipy import stats
 from statsmodels.stats import multitest
