@@ -17,9 +17,9 @@ def test_enrichment(
     aspect="all",
     species="human",
     release="current",
-    fetch=False,
     go_filters=None,
-    progress=True,
+    fetch=False,
+    progress=False,
 ):
     """Test for the enrichment of Gene Ontology terms from protein abundance.
 
@@ -49,13 +49,13 @@ def test_enrichment(
     release : str, optional
         The Gene Ontology release version. Using "current" will look up the
         most current version.
-    go_filters: List[str], optional
-        The go terms of interest. Should consists of the go term names such
-        as 'nucleus' or 'cytoplasm'.
+    go_filters: list of str, optional
+        The GO terms of interest. Should consists of the GO term names (ex:
+        "nucleus"), or GO term accessions (ex: "GO:0005634").
     fetch : bool, optional
-        Download the annotations even if the file already exists?
+        Download the GO annotations even if they have been downloaded before?
     progress : bool, optional
-        Show a progress bar?
+        Show a progress bar during enrichment tests?
 
     Returns
     -------
@@ -71,7 +71,10 @@ def test_enrichment(
     )
 
     if go_filters:
-        annot = annot[annot["go_name"].isin(go_filters)]
+        in_filter = annot["go_name"].isin(go_filters) | annot["go_id"].isin(
+            go_filters
+        )
+        annot = annot.loc[in_filter, :]
 
     accessions = pd.DataFrame(
         list(proteins.index),

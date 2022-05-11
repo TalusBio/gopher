@@ -50,7 +50,7 @@ def download_annotations(stem, release="current", fetch=False):
     return out_file
 
 
-def load_annotations(species, aspect=None, release="current", fetch=False):
+def load_annotations(species, aspect="all", release="current", fetch=False):
     """Load the Gene Ontology (GO) annotations for a species.
 
     Parameters
@@ -59,7 +59,7 @@ def load_annotations(species, aspect=None, release="current", fetch=False):
         The species for which to retrieve GO annotations. If not "humnan" or
         "yeast", see
         [here](http://current.geneontology.org/products/pages/downloads.html).
-    aspect : str, {"c", "f", "p"} or None
+    aspect : str, {"cc", "mf", "bp", "all"}, optional
         The Gene Ontology aspect to use. Use "c" for "Cellular Compartment",
         "f" for "Molecular Function", or "p" for "Biological Process". ``None``
         uses all of the them.
@@ -75,11 +75,15 @@ def load_annotations(species, aspect=None, release="current", fetch=False):
         A mapping of GO terms (keys) to Uniprot accessions with that
         annotation.
     """
-    aspect = None if aspect is None else aspect.upper()
-    if aspect not in {"C", "F", "P", None}:
+    aspects = {"cc": "C", "mf": "F", "bp": "P", "all": None}
+
+    try:
+        aspect = aspects[aspect.lower()]
+    except KeyError as err:
         raise ValueError(
-            f"Expected apsect ({aspect}) to be one of 'c', 'f', 'p', or None."
-        )
+            f"Expected apsect ({aspect}) to be one of 'cc', 'mf', 'bp', or"
+            " 'all'."
+        ) from err
 
     cols = [
         "db",
