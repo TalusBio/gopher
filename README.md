@@ -51,7 +51,7 @@ proteins = gopher.read_encyclopedia("RESULTS-quant.elib.proteins.txt")
 
 # Peform the GO enrichment analysis:
 results = gopher.test_enrichment(
-    proteins=df,
+    proteins=proteins,
     aspect="cc",
     go_subset=terms,
     progress=True,
@@ -59,7 +59,7 @@ results = gopher.test_enrichment(
 
 # Create a plot:
 plt.figure(figsize=(8, 3))
-sns.barplot(data=results_df, x="GO Name", y="pvalue (-log10)", hue="Run")
+sns.barplot(data=results, x="GO Name", y="pvalue (-log10)", hue="Run")
 plt.xticks(rotation=90)
 plt.tight_layout()
 plt.show()
