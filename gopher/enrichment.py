@@ -1,6 +1,7 @@
 """Calculate the enrichments for a collection of experiments."""
 import logging
 
+import numpy as np
 import pandas as pd
 from scipy import stats
 from statsmodels.stats import multitest
@@ -106,8 +107,8 @@ def test_enrichment(
         annot.groupby(grp_cols), disable=not progress
     ):
         in_term = proteins.index.isin(accessions["uniprot_accession"].unique())
-        in_vals = proteins[in_term].values
-        out_vals = proteins[~in_term].values
+        in_vals = proteins[in_term].to_numpy()
+        out_vals = proteins[~in_term].to_numpy()
         res = stats.mannwhitneyu(in_vals, out_vals, alternative="greater")
         results.append(list(term) + list(res[1]))
 

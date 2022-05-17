@@ -21,12 +21,8 @@ Here is an example:
 ``` python
 # Import packages
 import gopher
-import vizta
 import matplotlib.pyplot as plt
 import seaborn as sns
-
-# Use Talus Bio's plotting theme:
-vizta.mpl.set_theme()
 
 # Only test a few cellular compartment GO terms:
 terms = [
@@ -57,9 +53,18 @@ results = gopher.test_enrichment(
     progress=True,
 )
 
+# Format for plotting:
+long_df = results.melt(
+    ["GO Accession", "GO Name", "GO Aspect"], 
+    var_name="Run", 
+    value_name="pvalue",
+)
+long_df["neglogpval"] = -np.log10(long_df["pvalue"])
+
 # Create a plot:
 plt.figure(figsize=(8, 3))
-sns.barplot(data=results, x="GO Name", y="pvalue (-log10)", hue="Run")
+sns.barplot(data=long_df, x="GO Name", y="neglogpval", hue="Run")
+plt.ylabel("$-\log_{10}$ p-value")
 plt.xticks(rotation=90)
 plt.tight_layout()
 plt.show()

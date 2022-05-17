@@ -1,2 +1,2 @@
 """The parsers"""
-from .encyclopedia import read_encyclopedia
+from .tabular import read_encyclopedia, read_metamorpheus

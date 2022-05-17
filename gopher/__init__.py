@@ -16,5 +16,5 @@ except ImportError:
         pass
 
 from .config import get_data_dir, set_data_dir
-from .parsers import read_encyclopedia
+from .parsers import read_encyclopedia, read_metamorpheus
 from .enrichment import test_enrichment
