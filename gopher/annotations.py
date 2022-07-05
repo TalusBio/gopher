@@ -71,7 +71,7 @@ def load_annotations(species, aspect="all", release="current", fetch=False):
 
     Returns
     -------
-    dict of str: list of str -- actually a dictionary
+    dict of str: list of str
         A mapping of GO terms (keys) to Uniprot accessions with that
         annotation.
     """
