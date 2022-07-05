@@ -1,9 +1,7 @@
 import numpy as np
-from collections import namedtuple
-from scipy import special
 from scipy import stats
 import numba as nb
-from numba import njit
+
 
 @nb.njit(parallel=True)
 def tiecorrect(rankvals):

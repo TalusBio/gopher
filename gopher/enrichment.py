@@ -1,12 +1,10 @@
 """Calculate the enrichments for a collection of experiments."""
 import logging
 
-import numpy as np
 import pandas as pd
-from scipy import stats
 from statsmodels.stats import multitest
 from tqdm.auto import tqdm
-from .numba_function import numba_mannwhitneyu
+from .mannwhitneyu import numba_mannwhitneyu
 
 from .annotations import load_annotations
 

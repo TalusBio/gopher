@@ -1,5 +1,5 @@
 """Test that the enrichment functions are working correctly"""
-from gopher import enrichment, numba_function
+from gopher import enrichment, mannwhitneyu
 import pandas as pd
 import random
 from scipy import stats
@@ -33,7 +33,7 @@ def test_mannwhitneyu_small():
         list1.append(temp1)
         list2.append(temp2)
     res_scipy = stats.mannwhitneyu(list1, list2)
-    res_numba = numba_function.numba_mannwhitneyu(list1, list2)
+    res_numba = mannwhitneyu.numba_mannwhitneyu(list1, list2)
     sp = np.round(res_scipy[1], 5)
     num = np.round(res_numba[1], 5)
     assert np.array_equal(sp, num)
@@ -56,7 +56,7 @@ def test_mannwhitneyu_greater():
         list1.append(temp1)
         list2.append(temp2)
     res_scipy = stats.mannwhitneyu(list1, list2, alternative='greater')
-    res_numba = numba_function.numba_mannwhitneyu(list1, list2, alternative='greater')
+    res_numba = mannwhitneyu.numba_mannwhitneyu(list1, list2, alternative='greater')
     sp = np.round(res_scipy[1], 5)
     num = np.round(res_numba[1], 5)
     assert np.array_equal(sp, num)
@@ -79,7 +79,7 @@ def test_mannwhitneyu_less():
         list1.append(temp1)
         list2.append(temp2)
     res_scipy = stats.mannwhitneyu(list1, list2, alternative='less')
-    res_numba = numba_function.numba_mannwhitneyu(list1, list2, alternative='less')
+    res_numba = mannwhitneyu.numba_mannwhitneyu(list1, list2, alternative='less')
     sp = np.round(res_scipy[1], 5)
     num = np.round(res_numba[1], 5)
     assert np.array_equal(sp, num)
@@ -102,7 +102,7 @@ def test_mannwhitneyu_big():
         list1.append(temp1)
         list2.append(temp2)
     res_scipy = stats.mannwhitneyu(list1, list2)
-    res_numba = numba_function.numba_mannwhitneyu(list1, list2)
+    res_numba = mannwhitneyu.numba_mannwhitneyu(list1, list2)
     sp = np.round(res_scipy[1], 10)
     num = np.round(res_numba[1], 10)
     assert np.array_equal(sp, num)
