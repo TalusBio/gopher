@@ -105,13 +105,10 @@ def test_enrichment(
     for term, accessions in tqdm(
         annot.groupby(grp_cols), disable=not progress
     ):
-        # print(accessions["uniprot_accession"].unique())
+
         in_term = proteins.index.isin(accessions["uniprot_accession"].unique())
-        # print(in_term)
         in_vals = proteins[in_term].to_numpy()
-        # print(in_vals)
         out_vals = proteins[~in_term].to_numpy()
-        # print(out_vals)
         res = numba_mannwhitneyu(in_vals, out_vals, alternative="greater")
         if res != None:
             results.append(list(term) + list(res[1]))
