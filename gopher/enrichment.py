@@ -1,11 +1,10 @@
 """Calculate the enrichments for a collection of experiments."""
 import logging
 
-import numpy as np
 import pandas as pd
-from scipy import stats
 from statsmodels.stats import multitest
 from tqdm.auto import tqdm
+from .mannwhitneyu import numba_mannwhitneyu
 
 from .annotations import load_annotations
 
@@ -106,11 +105,16 @@ def test_enrichment(
     for term, accessions in tqdm(
         annot.groupby(grp_cols), disable=not progress
     ):
+        # print(accessions["uniprot_accession"].unique())
         in_term = proteins.index.isin(accessions["uniprot_accession"].unique())
+        # print(in_term)
         in_vals = proteins[in_term].to_numpy()
+        # print(in_vals)
         out_vals = proteins[~in_term].to_numpy()
-        res = stats.mannwhitneyu(in_vals, out_vals, alternative="greater")
-        results.append(list(term) + list(res[1]))
+        # print(out_vals)
+        res = numba_mannwhitneyu(in_vals, out_vals, alternative="greater")
+        if res != None:
+            results.append(list(term) + list(res[1]))
 
     cols = ["GO Accession", "GO Name", "GO Aspect"] + list(proteins.columns)
     results = pd.DataFrame(results, columns=cols)
