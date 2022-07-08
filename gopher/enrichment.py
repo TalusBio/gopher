@@ -4,7 +4,7 @@ import logging
 import pandas as pd
 from statsmodels.stats import multitest
 from tqdm.auto import tqdm
-from .mannwhitneyu import numba_mannwhitneyu
+from .stats import mannwhitneyu
 
 from .annotations import load_annotations
 
@@ -109,7 +109,7 @@ def test_enrichment(
         in_term = proteins.index.isin(accessions["uniprot_accession"].unique())
         in_vals = proteins[in_term].to_numpy()
         out_vals = proteins[~in_term].to_numpy()
-        res = numba_mannwhitneyu(in_vals, out_vals, alternative="greater")
+        res = mannwhitneyu(in_vals, out_vals, alternative="greater")
         if res != None:
             results.append(list(term) + list(res[1]))
 

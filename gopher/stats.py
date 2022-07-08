@@ -1,3 +1,4 @@
+"""Numba Mann-Whitney U test"""
 import numpy as np
 from scipy import stats
 import numba as nb
@@ -5,17 +6,14 @@ import numba as nb
 
 @nb.njit(parallel=True)
 def tiecorrect(rankvals):
-    """
-    parallelized version of scipy.stats.tiecorrect
-    """
+    """Parallelized version of scipy.stats.tiecorrect"""
     tc = np.ones(rankvals.shape[1], dtype=np.float64)
     for j in nb.prange(rankvals.shape[1]):
         arr = np.sort(np.ravel(rankvals[:, j]))
-        idx = np.nonzero(
-            np.concatenate(
-                (np.array([True]), arr[1:] != arr[:-1], np.array([True]))
-            )
-        )[0]
+        is_not_tie = np.concatenate(
+            (np.array([True]), arr[1:] != arr[:-1], np.array([True]))
+        )
+        idx = np.nonzero(is_not_tie)[0]
         cnt = np.diff(idx).astype(np.float64)
 
         size = np.float64(arr.size)
@@ -27,9 +25,7 @@ def tiecorrect(rankvals):
 
 @nb.njit(parallel=True)
 def rankdata(data):
-    """
-    parallelized version of scipy.stats.rankdata
-    """
+    """Parallelized version of scipy.stats.rankdata"""
     ranked = np.empty(data.shape, dtype=np.float64)
     for j in nb.prange(data.shape[1]):
         arr = np.ravel(data[:, j])
@@ -48,10 +44,9 @@ def rankdata(data):
     return ranked
 
 
-def numba_mannwhitneyu(x, y, alternative="two-sided", use_continuity=True):
-    """Version of Mann-Whitney U-test that runs in parallel on 2d arrays
-    this is the asymptotic algo only
-    """
+def mannwhitneyu(x, y, alternative="two-sided", use_continuity=True):
+    """Version of Mann-Whitney U-test that runs in parallel on 2d arrays.
+    This is the asymptotic algo only."""
     x = np.asarray(x)
     y = np.asarray(y)
     assert x.shape[1] == y.shape[1]
@@ -72,7 +67,7 @@ def numba_mannwhitneyu(x, y, alternative="two-sided", use_continuity=True):
 
     # if *everything* is identical we'll raise an error, not otherwise
     if np.all(T == 0):
-        raise ValueError("All numbers are identical in mannwhitneyu")
+        raise ValueError("All numbers are identical")
 
     # get mean and standard deviation
     sd = np.sqrt(T * n1 * n2 * (n1 + n2 + 1) / 12.0)
