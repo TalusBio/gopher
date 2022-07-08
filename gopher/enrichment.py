@@ -21,7 +21,6 @@ def test_enrichment(
     contaminants_filter=None,
     fetch=False,
     progress=False,
-    annotations=pd.DataFrame(),
 ):
     """Test for the enrichment of Gene Ontology terms from protein abundance.
 
@@ -68,17 +67,12 @@ def test_enrichment(
         The adjusted p-value for each tested GO term in each sample.
     """
     LOGGER.info("Retrieving GO annotations...")
-    if len(annotations) != 0:
-        annot = annotations
-    else:
-        annot = load_annotations(
-            species=species,
-            aspect=aspect,
-            release=release,
-            fetch=fetch,
-        )
-        # annot.to_csv('annotations_file.csv')
-    # print(annot)
+    annot = load_annotations(
+        species=species,
+        aspect=aspect,
+        release=release,
+        fetch=fetch,
+    )
 
     if go_subset:
         in_names = annot["go_name"].isin(go_subset)
@@ -124,7 +118,6 @@ def test_enrichment(
     results.loc[:, proteins.columns] = results.loc[:, proteins.columns].apply(
         adjust_pvals, raw=True
     )
-    # print(results)
     return results
 
 
