@@ -1,11 +1,10 @@
 """Calculate the enrichments for a collection of experiments."""
 import logging
 
-import numpy as np
 import pandas as pd
-from scipy import stats
 from statsmodels.stats import multitest
 from tqdm.auto import tqdm
+from .stats import mannwhitneyu
 
 from .annotations import load_annotations
 
@@ -22,6 +21,7 @@ def test_enrichment(
     contaminants_filter=None,
     fetch=False,
     progress=False,
+    annotations=pd.DataFrame(),
 ):
     """Test for the enrichment of Gene Ontology terms from protein abundance.
 
@@ -68,12 +68,15 @@ def test_enrichment(
         The adjusted p-value for each tested GO term in each sample.
     """
     LOGGER.info("Retrieving GO annotations...")
-    annot = load_annotations(
-        species=species,
-        aspect=aspect,
-        release=release,
-        fetch=fetch,
-    )
+    if len(annotations) != 0:
+        annot = annotations
+    else:
+        annot = load_annotations(
+            species=species,
+            aspect=aspect,
+            release=release,
+            fetch=fetch,
+        )
 
     if go_subset:
         in_names = annot["go_name"].isin(go_subset)
@@ -106,17 +109,20 @@ def test_enrichment(
     for term, accessions in tqdm(
         annot.groupby(grp_cols), disable=not progress
     ):
+
         in_term = proteins.index.isin(accessions["uniprot_accession"].unique())
         in_vals = proteins[in_term].to_numpy()
         out_vals = proteins[~in_term].to_numpy()
-        res = stats.mannwhitneyu(in_vals, out_vals, alternative="greater")
-        results.append(list(term) + list(res[1]))
+        res = mannwhitneyu(in_vals, out_vals, alternative="greater")
+        if res != None:
+            results.append(list(term) + list(res[1]))
 
     cols = ["GO Accession", "GO Name", "GO Aspect"] + list(proteins.columns)
     results = pd.DataFrame(results, columns=cols)
     results.loc[:, proteins.columns] = results.loc[:, proteins.columns].apply(
         adjust_pvals, raw=True
     )
+
     return results
 
 
