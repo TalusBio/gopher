@@ -77,8 +77,6 @@ def test_enrichment(
             release=release,
             fetch=fetch,
         )
-        # annot.to_csv('annotations_file.csv')
-    # print(annot)
 
     if go_subset:
         in_names = annot["go_name"].isin(go_subset)
@@ -124,7 +122,7 @@ def test_enrichment(
     results.loc[:, proteins.columns] = results.loc[:, proteins.columns].apply(
         adjust_pvals, raw=True
     )
-    # print(results)
+
     return results
 
 

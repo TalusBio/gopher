@@ -106,7 +106,6 @@ def load_annotations(species, aspect="all", release="current", fetch=False):
     ]
 
     terms = ontologies.load_ontology()
-    # print(terms)
     species = SPECIES.get(species.lower(), species.lower())
     annot_file = download_annotations(species, release=release, fetch=fetch)
     annot = pd.read_table(
@@ -116,9 +115,6 @@ def load_annotations(species, aspect="all", release="current", fetch=False):
         names=cols,
         low_memory=False,
     )
-
-    # print(annot)
-    # annot.to_csv('annotations_file.csv')
 
     if aspect is not None:
         annot = annot.loc[annot["aspect"] == aspect, :]
@@ -132,5 +128,4 @@ def load_annotations(species, aspect="all", release="current", fetch=False):
     keep = ["uniprot_accession", "go_id", "aspect"]
     annot = annot.loc[:, keep].drop_duplicates()
     annot["go_name"] = annot["go_id"].map(terms)
-    # annot.to_csv('annotations_file.csv')
     return annot
