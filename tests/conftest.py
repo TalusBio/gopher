@@ -10,6 +10,9 @@ We need:
 import json
 import socket
 import ftplib
+import random
+import pandas as pd
+import numpy as np
 
 import pytest
 import requests
@@ -128,3 +131,23 @@ def block_internet(monkeypatch):
             raise OSError("Network call blocked")
 
     monkeypatch.setattr(socket, "socket", Blocker)
+
+
+@pytest.fixture
+def generate_proteins():
+    prot = ["P10809", "P35527", "Q9UMS4", "P35637", "P07437", "Q86UX7"]
+    sample1 = []
+    sample2 = []
+    for _ in range(len(prot)):
+        sample1.append(random.randint(100000, 1000000))
+        sample2.append(random.randint(100000, 1000000))
+    data = {"Protein": prot, "Sample 1": sample1, "Sample 2": sample2}
+    return pd.DataFrame(data)
+
+
+@pytest.fixture
+def generate_arrays():
+    rng = np.random.default_rng(1)  # A random number generator
+    list1 = rng.integers(1, 10, size=(20, 5)).tolist()
+    list2 = rng.integers(5, 15, size=(20, 5)).tolist()
+    return list1, list2
