@@ -12,7 +12,15 @@ def test_entire_enrichment_analysis(generate_proteins):
     This test will run the full GO enrichment on a dataset."""
     df = generate_proteins
     df.set_index("Protein", inplace=True)
-    result = enrichment.test_enrichment(df)
+    result, tab = enrichment.test_enrichment(df, table=True)
+    assert isinstance(result, pd.DataFrame)
+
+
+def test_protein_mapping(generate_proteins):
+    """Check that the protein mapping function returns a dataframe."""
+    df = generate_proteins
+    df.set_index("Protein", inplace=True)
+    result = enrichment.map_proteins(df)
     assert isinstance(result, pd.DataFrame)
 
 
