@@ -57,9 +57,8 @@ def mannwhitneyu(x, y, alternative="two-sided", use_continuity=True):
     # rank the data for the test
     ranked = rankdata(np.concatenate((x, y)))
     rankx = ranked[0:n1, :]  # get the x-ranks
-    u1 = (
-        n1 * n2 + (n1 * (n1 + 1)) / 2.0 - np.sum(rankx, axis=0)
-    )  # calc U for x
+    r = np.sum(rankx, axis=0)
+    u1 = n1 * n2 + (n1 * (n1 + 1)) / 2.0 - r  # calc U for x
     u2 = n1 * n2 - u1  # remainder is U for y
 
     # check for ties in the rankings
@@ -89,4 +88,6 @@ def mannwhitneyu(x, y, alternative="two-sided", use_continuity=True):
     p *= f
     p = np.clip(p, 0, 1)
 
-    return u1, p
+    auc = U / (n1 * n2)
+
+    return U, p

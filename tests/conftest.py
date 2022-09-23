@@ -135,13 +135,39 @@ def block_internet(monkeypatch):
 
 @pytest.fixture
 def generate_proteins():
-    prot = ["P10809", "P35527", "Q9UMS4", "P35637", "P07437", "Q86UX7"]
+    prot = [
+        "P10809",
+        "P35527",
+        "Q9UMS4",
+        "P35637",
+        "P07437",
+        "Q86UX7",
+        "Q8N766",
+        "P52907",
+        "Q9NV31",
+        "P50570",
+        "Q9BZJ0",
+        "Q9GZM5",
+        "P08758",
+        "Q9BRU9",
+        "Q8NBJ7",
+        "Q15532",
+        "Q14241",
+        "Q14562",
+    ]
     sample1 = []
     sample2 = []
+    sample3 = []
     for _ in range(len(prot)):
         sample1.append(random.randint(100000, 1000000))
         sample2.append(random.randint(100000, 1000000))
-    data = {"Protein": prot, "Sample 1": sample1, "Sample 2": sample2}
+        sample3.append(random.randint(100000, 1000000))
+    data = {
+        "Protein": prot,
+        "Sample 1": sample1,
+        "Sample 2": sample2,
+        "Sample 3": sample3,
+    }
     return pd.DataFrame(data)
 
 

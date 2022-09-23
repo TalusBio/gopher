@@ -21,7 +21,6 @@ def test_enrichment(
     contaminants_filter=None,
     fetch=False,
     progress=False,
-    table=False,
 ):
     """Test for the enrichment of Gene Ontology terms from protein abundance.
 
@@ -61,8 +60,6 @@ def test_enrichment(
         Download the GO annotations even if they have been downloaded before?
     progress : bool, optional
         Show a progress bar during enrichment tests?
-    table : bool, optional
-        Return the table with protein accession and GO terms
 
     Returns
     -------
@@ -123,79 +120,8 @@ def test_enrichment(
     results.loc[:, proteins.columns] = results.loc[:, proteins.columns].apply(
         adjust_pvals, raw=True
     )
-    if table:
-        return results, annot
+
     return results
-
-
-def map_proteins(
-    proteins,
-    aspect="all",
-    species="human",
-    release="current",
-    go_subset=None,
-    contaminants_filter=None,
-    fetch=False,
-):
-    """Map the proteins to the GO terms
-
-    Parameters
-    ----------
-    proteins : pandas.DataFrame
-        A dataframe where the indices are UniProt accessions and each column is
-        an experiment to test. The values in this dataframe should be some
-        measure of protein abundance: these could be the raw measurement if
-        originating from a single sample or a fold-change/p-value if looking at
-        the difference between two conditions.
-    aspect : str, {"cc", "mf", "bp", "all"}, optional
-        The Gene Ontology aspect to use. Use "cc" for "Cellular Compartment",
-        "mf" for "Molecular Function", "bp" for "Biological Process", or "all"
-        for all three.
-    species : str, {"human", "yeast", ...}, optional.
-        The species for which to retrieve GO annotations. If not "human" or
-        "yeast", see
-        [here](http://current.geneontology.org/products/pages/downloads.html).
-    release : str, optional
-        The Gene Ontology release version. Using "current" will look up the
-        most current version.
-    go_subset: list of str, optional
-        The go terms of interest. Should consists of the go term names such
-        as 'nucleus' or 'cytoplasm'.
-    contaminants_filter: List[str], optional
-        A list of uniprot accessions for common contaminants such as
-        Keratin to filter out.
-    fetch : bool, optional
-        Download the GO annotations even if they have been downloaded before?
-
-    Returns
-    -------
-    pandas.DataFrame
-        Dataframe with protein accessions and GO terms
-    """
-    LOGGER.info("Retrieving GO annotations...")
-    annot = load_annotations(
-        species=species,
-        aspect=aspect,
-        release=release,
-        fetch=fetch,
-    )
-
-    if go_subset:
-        in_names = annot["go_name"].isin(go_subset)
-        in_ids = annot["go_id"].isin(go_subset)
-        annot = annot.loc[in_names | in_ids, :]
-
-    accessions = pd.DataFrame(
-        list(proteins.index),
-        columns=["uniprot_accession"],
-    )
-    if contaminants_filter:
-        accessions = accessions[
-            ~accessions["uniprot_accession"].isin(contaminants_filter)
-        ]
-
-    annot = accessions.merge(annot, how="inner")
-    return annot
 
 
 def adjust_pvals(pvals):
