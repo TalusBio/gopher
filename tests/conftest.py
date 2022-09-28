@@ -13,7 +13,7 @@ import ftplib
 import random
 import pandas as pd
 import numpy as np
-
+from pathlib import Path
 import pytest
 import requests
 
@@ -177,3 +177,12 @@ def generate_arrays():
     list1 = rng.integers(1, 10, size=(20, 5)).tolist()
     list2 = rng.integers(5, 15, size=(20, 5)).tolist()
     return list1, list2
+
+
+@pytest.fixture
+def real_data(tmp_path):
+    """Test using small files."""
+    fasta_df = Path("../data/small-yeast.fasta")
+    quant = pd.read_csv("../data/yeast_small.csv")
+    quant = quant.set_index("Protein")
+    return quant, fasta_df

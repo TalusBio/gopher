@@ -38,7 +38,6 @@ def normalize(proteins, fasta):
     return df
 
 
-#
 def col_norm(col):
     """Calculate the ratio of protein/total protein"""
     return col / col.sum()

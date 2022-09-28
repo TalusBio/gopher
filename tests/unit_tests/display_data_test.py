@@ -10,8 +10,7 @@ def test_protein_mapping():
 
 
 def test_rankings(generate_proteins):
-    """Check that the test enrichment function returns a dataframe.
-    This test will run the full GO enrichment on a dataset."""
+    """Check that the test ranking function returns a dataframe."""
     df = generate_proteins
     df.set_index("Protein", inplace=True)
     result = display_data.get_rankings(df, "cytoplasm")
@@ -19,6 +18,7 @@ def test_rankings(generate_proteins):
 
 
 def test_roc(generate_proteins):
+    """Check that the ROC function returns something."""
     df = generate_proteins
     df.set_index("Protein", inplace=True)
     result = display_data.roc(df, "cytoplasm")
