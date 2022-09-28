@@ -5,6 +5,7 @@ import pandas as pd
 from statsmodels.stats import multitest
 from tqdm.auto import tqdm
 from .stats import mannwhitneyu
+from .tree_search import tree_search, reflect_mapping
 
 from .annotations import load_annotations
 
@@ -67,7 +68,7 @@ def test_enrichment(
         The adjusted p-value for each tested GO term in each sample.
     """
     LOGGER.info("Retrieving GO annotations...")
-    annot = load_annotations(
+    annot, mapping = load_annotations(
         species=species,
         aspect=aspect,
         release=release,
@@ -75,6 +76,8 @@ def test_enrichment(
     )
 
     if go_subset:
+        annot = tree_search(mapping, go_subset, annot)
+
         in_names = annot["go_name"].isin(go_subset)
         in_ids = annot["go_id"].isin(go_subset)
         annot = annot.loc[in_names | in_ids, :]

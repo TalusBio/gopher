@@ -35,6 +35,7 @@ def load_ontology():
         data = obo_ref.read().split("\n\n")[1:]
 
     terms = {}
+    mapping = {}
     for term in data:
         term_data = term.splitlines()
         term_id, term_name = None, None
@@ -48,8 +49,14 @@ def load_ontology():
                 term_id = val
             elif key == "name":
                 term_name = val
+            elif key == "is_a":
+                val = val.split(" ", 1)[0]
+                if val in mapping.keys():
+                    mapping[val].append(term_id)
+                else:
+                    mapping[val] = [term_id]
 
             if term_id is not None and term_name is not None:
                 terms[term_id] = term_name
 
-    return terms
+    return terms, mapping

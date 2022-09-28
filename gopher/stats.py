@@ -88,6 +88,4 @@ def mannwhitneyu(x, y, alternative="two-sided", use_continuity=True):
     p *= f
     p = np.clip(p, 0, 1)
 
-    auc = U / (n1 * n2)
-
     return U, p
