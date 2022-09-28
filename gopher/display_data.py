@@ -133,7 +133,7 @@ def get_annotations(
         Dataframe with protein annotations
     """
     # Load the annotation file
-    annot = load_annotations(
+    annot, _ = load_annotations(
         species=species,
         aspect=aspect,
         release=release,

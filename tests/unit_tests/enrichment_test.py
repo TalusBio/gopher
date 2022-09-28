@@ -16,6 +16,24 @@ def test_entire_enrichment_analysis(generate_proteins):
     assert isinstance(result, pd.DataFrame)
 
 
+def test_subset_enrichment_analysis(generate_proteins):
+    """Check that the test enrichment function returns a dataframe.
+    This test will run the full GO enrichment on a dataset."""
+    df = generate_proteins
+    df.set_index("Protein", inplace=True)
+    terms = [
+        "nucleus",
+        "nucleoplasm",
+        "euchromatin",
+        "heterochromatin",
+        "protein-DNA complex",
+        "lysosome",
+        "cytoplasm",
+    ]
+    result = enrichment.test_enrichment(df, go_subset=terms)
+    assert isinstance(result, pd.DataFrame)
+
+
 def test_mannwhitneyu_small(generate_arrays):
     """Test the Mann-Whitney U numba function returns the same values
     as the scipy function on a small dataset for a two-sided test"""
