@@ -6,7 +6,7 @@ def test_tree_mapping(generate_mapping):
     """Test the tree mapping functionality maps the terms and returns the new mapping in a dictionary."""
     mapping = generate_mapping
     go_subset = ["a", "y", "z"]
-    mapped = tree_search.tree_map(mapping, go_subset)
+    mapped = tree_search.new_tree_map(mapping, go_subset)
     assert isinstance(mapped, dict)
 
 

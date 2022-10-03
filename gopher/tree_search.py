@@ -26,13 +26,13 @@ def tree_search(mapping, go_subset, annot):
     in_ids = annot["go_id"].isin(go_subset)
     subset = annot.loc[in_names | in_ids, :]["go_id"].unique().tolist()
     # Get the new mapping for the subset of terms with all the children associated with each term
-    mapped = tree_map(mapping, subset)
+    new_mapping = new_tree_map(mapping, subset)
     # Incorporate the new mapping into the graph and return the updated graph
-    new_annot = update_tree(mapped, annot)
+    new_annot = update_tree(new_mapping, annot)
     return new_annot
 
 
-def tree_map(mapping, subset):
+def new_tree_map(mapping, subset):
     """Tree search algorithm that gets all children nodes (or terms) from the specified parent.
 
     Parameters
