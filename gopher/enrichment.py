@@ -5,7 +5,7 @@ import pandas as pd
 from statsmodels.stats import multitest
 from tqdm.auto import tqdm
 from .stats import mannwhitneyu
-from .tree_search import tree_search, reflect_mapping
+from .tree_search import tree_search
 
 from .annotations import load_annotations
 
@@ -22,6 +22,7 @@ def test_enrichment(
     contaminants_filter=None,
     fetch=False,
     progress=False,
+    tree_alg=False,
 ):
     """Test for the enrichment of Gene Ontology terms from protein abundance.
 
@@ -76,7 +77,8 @@ def test_enrichment(
     )
 
     if go_subset:
-        annot = tree_search(mapping, go_subset, annot)
+        if tree_alg:
+            annot = tree_search(mapping, go_subset, annot)
 
         in_names = annot["go_name"].isin(go_subset)
         in_ids = annot["go_id"].isin(go_subset)

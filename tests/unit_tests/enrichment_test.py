@@ -18,7 +18,7 @@ def test_entire_enrichment_analysis(generate_proteins):
 
 def test_subset_enrichment_analysis(generate_proteins):
     """Check that the test enrichment function returns a dataframe.
-    This test will run the full GO enrichment on a dataset."""
+    This test will run the GO enrichment on a subset of terms."""
     df = generate_proteins
     df.set_index("Protein", inplace=True)
     terms = [

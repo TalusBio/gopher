@@ -13,6 +13,7 @@ import ftplib
 import random
 import pandas as pd
 import numpy as np
+import string
 
 import pytest
 import requests
@@ -135,6 +136,7 @@ def block_internet(monkeypatch):
 
 @pytest.fixture
 def generate_proteins():
+    "Generate a random list of protein data"
     prot = [
         "P10809",
         "P35527",
@@ -154,6 +156,8 @@ def generate_proteins():
         "Q15532",
         "Q14241",
         "Q14562",
+        "Q9NZM5",
+        "P52926",
     ]
     sample1 = []
     sample2 = []
@@ -173,7 +177,36 @@ def generate_proteins():
 
 @pytest.fixture
 def generate_arrays():
+    "Generate arrays with random numbers"
     rng = np.random.default_rng(1)  # A random number generator
     list1 = rng.integers(1, 10, size=(20, 5)).tolist()
     list2 = rng.integers(5, 15, size=(20, 5)).tolist()
     return list1, list2
+
+
+@pytest.fixture
+def generate_mapping():
+    "Create mock mapping"
+    mapping = {
+        "a": ["b", "c", "d"],
+        "b": ["e"],
+        "e": ["f"],
+        "d": ["g", "h"],
+        "i": ["j", "k", "y"],
+        "x": ["y", "z"],
+        "y": ["z"],
+        "z": ["l", "m", "n"],
+    }
+    return mapping
+
+
+@pytest.fixture
+def generate_annotations():
+    "Create annotations for mock data"
+    annot = {
+        "uniprot_accession": list(range(0, 26)),
+        "go_id": list(string.ascii_lowercase),
+        "aspect": [None] * 26,
+        "go_name": list(string.ascii_uppercase),
+    }
+    return pd.DataFrame.from_dict(annot)
