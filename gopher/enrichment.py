@@ -22,13 +22,13 @@ def test_enrichment(
     contaminants_filter=None,
     fetch=False,
     progress=False,
-    tree_alg=False,
+    aggregate_terms=True,
 ):
     """Test for the enrichment of Gene Ontology terms from protein abundance.
 
     The Mann-Whitney U Test is applied to each column of proteins dataframe and
     for each Gene Ontology (GO) term. The p-values are then corrected for
-    multiple hypothesis testing accross all of the columns using the
+    multiple hypothesis testing across all of the columns using the
     Benjamini-Hochberg procedure.
 
     Parameters
@@ -77,7 +77,7 @@ def test_enrichment(
     )
 
     if go_subset:
-        if tree_alg:
+        if aggregate_terms:
             annot = tree_search(mapping, go_subset, annot)
 
         in_names = annot["go_name"].isin(go_subset)
@@ -93,9 +93,8 @@ def test_enrichment(
             ~accessions["uniprot_accession"].isin(contaminants_filter)
         ]
 
-    annot = accessions.merge(
-        annot, how="inner"
-    )  # This here has GO terms and proteins
+    # Get the GO terms and proteins
+    annot = accessions.merge(annot, how="inner")
     n_prot = proteins.shape[1]
     proteins = pd.DataFrame(proteins).loc[annot["uniprot_accession"], :]
     lost = n_prot - proteins.shape[1]

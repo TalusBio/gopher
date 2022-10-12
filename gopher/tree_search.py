@@ -1,5 +1,6 @@
 import copy
 import pandas as pd
+from collections import defaultdict
 
 
 def tree_search(mapping, go_subset, annot):
@@ -48,14 +49,11 @@ def new_tree_map(mapping, subset):
     dictionary
         Dictionary with terms in the subset as the keys and all children of the term as values
     """
-    subset_mapping = {}
+    subset_mapping = defaultdict(list)
     # For every term, get all the children of that node
     for item in subset:
         result = map(item, mapping)
-        if result:
-            subset_mapping[item] = result
-        else:
-            subset_mapping[item] = []
+        subset_mapping[item] = result
     # Return the new mapping
     return subset_mapping
 
@@ -78,7 +76,7 @@ def map(term, mapping):
     """
     # Base case: if there are no children of the current term, return
     if term not in mapping.keys():
-        return
+        return []
     # Get all children of the current term
     children = mapping[term]
     result = copy.copy(children)

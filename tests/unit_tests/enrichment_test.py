@@ -31,7 +31,8 @@ def test_subset_enrichment_analysis(generate_proteins):
         "cytoplasm",
     ]
     result = enrichment.test_enrichment(df, go_subset=terms)
-    assert isinstance(result, pd.DataFrame)
+    terms_found = result["GO Name"].unique()
+    assert all(t in terms for t in terms_found)
 
 
 def test_mannwhitneyu_small(generate_arrays):

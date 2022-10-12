@@ -116,8 +116,6 @@ def load_annotations(species, aspect="all", release="current", fetch=False):
         low_memory=False,
     )
 
-    annot.to_csv("annotation.csv")
-
     if aspect is not None:
         annot = annot.loc[annot["aspect"] == aspect, :]
 
