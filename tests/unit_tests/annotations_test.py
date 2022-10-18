@@ -7,7 +7,7 @@ import pandas as pd
 
 def test_different_species():
     """Check that the annotations can load different species"""
-    load = annotations.load_annotations("mgi", "cc")
+    load, _ = annotations.load_annotations("mgi", "cc")
     assert isinstance(load, pd.DataFrame)
 
 
