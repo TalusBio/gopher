@@ -3,6 +3,7 @@ import requests
 import pandas as pd
 
 from . import utils, config, ontologies
+import random
 
 SPECIES = {
     "yeast": "sgd",
@@ -10,6 +11,36 @@ SPECIES = {
     "human": "goa_human",
     "homo sapiens": "goa_human",
 }
+
+
+def generate_annotations(proteins, aspect, go_name):
+    """Generate an annotation file for a list of proteins that are correlated to a single term and aspect.
+
+    Parameters
+    ----------
+    proteins : list
+        List of proteins that will be annotated to a term.
+    aspect: str
+        String specifying the aspect the term is in ("C", "F", "P").
+    go_name : str
+        String of the GO name for the proteins
+
+    Returns
+    -------
+    pd.DataFrame
+        An annotations dataframe with a single go term.
+    """
+    # Generate a unique GO ID
+    id = "GO:" + str(random.randrange(3 * 10**6, 10**7))
+    # Create the annotations df
+    data = {
+        "uniprot_accession": proteins,
+        "go_id": id,
+        "aspect": aspect,
+        "go_name": go_name,
+    }
+    annot = pd.DataFrame.from_dict(data)
+    return annot
 
 
 def download_annotations(stem, release="current", fetch=False):
