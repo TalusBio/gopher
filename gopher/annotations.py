@@ -13,8 +13,10 @@ SPECIES = {
 }
 
 
-def generate_annotations(proteins, aspect, go_name):
+def generate_annotations(proteins, aspect, go_name, go_id=None):
     """Generate an annotation file for a list of proteins that are correlated to a single term and aspect.
+
+    The term can be in the GO database or a new term.
 
     Parameters
     ----------
@@ -24,18 +26,21 @@ def generate_annotations(proteins, aspect, go_name):
         String specifying the aspect the term is in ("C", "F", "P").
     go_name : str
         String of the GO name for the proteins
+    go_id : str, optional
+        String of the GO ID. If in the GO database, the go id and go name should match the database.
 
     Returns
     -------
     pd.DataFrame
         An annotations dataframe with a single go term.
     """
-    # Generate a unique GO ID
-    id = "GO:" + str(random.randrange(3 * 10**6, 10**7))
+    if not go_id:
+        # Generate a unique GO ID if one is not given
+        go_id = "GO:" + str(random.randrange(3 * 10**6, 10**7))
     # Create the annotations df
     data = {
         "uniprot_accession": proteins,
-        "go_id": id,
+        "go_id": go_id,
         "aspect": aspect,
         "go_name": go_name,
     }
