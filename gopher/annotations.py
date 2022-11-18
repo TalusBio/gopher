@@ -3,7 +3,7 @@ import requests
 import pandas as pd
 
 from . import utils, config, ontologies
-import random
+import uuid
 
 SPECIES = {
     "yeast": "sgd",
@@ -31,12 +31,12 @@ def generate_annotations(proteins, aspect, go_name, go_id=None):
 
     Returns
     -------
-    pd.DataFrame
+    pandas.DataFrame
         An annotations dataframe with a single go term.
     """
     if not go_id:
         # Generate a unique GO ID if one is not given
-        go_id = "GO:" + str(random.randrange(3 * 10**6, 10**7))
+        go_id = "GO:" + str(uuid.uuid4().int)
     # Create the annotations df
     data = {
         "uniprot_accession": proteins,
@@ -45,6 +45,7 @@ def generate_annotations(proteins, aspect, go_name, go_id=None):
         "go_name": go_name,
     }
     annot = pd.DataFrame.from_dict(data)
+    print(annot)
     return annot
 
 

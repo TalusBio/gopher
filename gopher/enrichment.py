@@ -22,7 +22,7 @@ def test_enrichment(
     contaminants_filter=None,
     fetch=False,
     progress=False,
-    annotations=pd.DataFrame(),
+    annotations=None,
     mapping=None,
     aggregate_terms=True,
 ):
@@ -64,7 +64,7 @@ def test_enrichment(
         Download the GO annotations even if they have been downloaded before?
     progress : bool, optional
         Show a progress bar during enrichment tests?
-    annotations: pd.dataFrame(), optional
+    annotations: pandas.dataFrame(), optional
         A custom annotations file.
     mapping: defaultdict, optional
         A custom mapping of the GO term relationships.
@@ -77,7 +77,7 @@ def test_enrichment(
     """
     LOGGER.info("Retrieving GO annotations...")
 
-    if len(annotations) != 0:
+    if annotations is not None:
         annot = annotations
     else:
         annot, map = load_annotations(
