@@ -64,8 +64,8 @@ def test_enrichment(
         Download the GO annotations even if they have been downloaded before?
     progress : bool, optional
         Show a progress bar during enrichment tests?
-    annotations: pandas.dataFrame(), optional
-        A custom annotations file.
+    annotations: pandas.DataFrame, optional
+        A custom annotations dataframe.
     mapping: defaultdict, optional
         A custom mapping of the GO term relationships.
     aggregate_terms : bool, optional
