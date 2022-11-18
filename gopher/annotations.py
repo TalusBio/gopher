@@ -45,7 +45,6 @@ def generate_annotations(proteins, aspect, go_name, go_id=None):
         "go_name": go_name,
     }
     annot = pd.DataFrame.from_dict(data)
-    print(annot)
     return annot
 
 
