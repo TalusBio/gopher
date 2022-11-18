@@ -1,5 +1,6 @@
 """Test that the enrichment functions are working correctly"""
 from gopher import enrichment
+from gopher import annotations
 import gopher
 import pandas as pd
 import random
@@ -33,6 +34,51 @@ def test_subset_enrichment_analysis(generate_proteins):
     result = enrichment.test_enrichment(df, go_subset=terms)
     terms_found = result["GO Name"].unique()
     assert all(t in terms for t in terms_found)
+
+
+def test_custom_annotations(generate_proteins):
+    """Test that a custom annotations file gives a different output than the default and contains the new GO term,"""
+    prot = generate_proteins
+    custom = annotations.generate_annotations(
+        proteins=prot["Protein"][: len(prot) // 2], aspect="C", go_name="test"
+    )
+    full, _ = annotations.load_annotations(species="human")
+    annot = pd.concat([custom, full])
+    prot.set_index("Protein", inplace=True)
+    terms = [
+        "nucleus",
+        "nucleoplasm",
+        "euchromatin",
+        "heterochromatin",
+        "protein-DNA complex",
+        "lysosome",
+        "cytoplasm",
+        "test",
+    ]
+    custom_result = enrichment.test_enrichment(
+        prot, annotations=annot, go_subset=terms, aggregate_terms=False
+    )
+    normal_result = enrichment.test_enrichment(
+        prot, go_subset=terms, aggregate_terms=False
+    )
+    assert not custom_result.equals(normal_result)
+    terms_found = custom_result["GO Name"].unique()
+    assert all(t in terms for t in terms_found)
+    assert "test" in terms_found
+
+
+def test_custom_mapping_annotations(
+    generate_fake_proteins, generate_annotations, generate_mapping
+):
+    """Test the custom mapping and custom annotations on fake data."""
+    subset = ["b", "i", "z"]
+    result = enrichment.test_enrichment(
+        generate_fake_proteins,
+        annotations=generate_annotations,
+        mapping=generate_mapping,
+        go_subset=subset,
+    )
+    assert result["GO ID"].values.tolist() == subset
 
 
 def test_mannwhitneyu_small(generate_arrays):

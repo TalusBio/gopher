@@ -22,6 +22,8 @@ def test_enrichment(
     contaminants_filter=None,
     fetch=False,
     progress=False,
+    annotations=None,
+    mapping=None,
     aggregate_terms=True,
 ):
     """Test for the enrichment of Gene Ontology terms from protein abundance.
@@ -62,22 +64,33 @@ def test_enrichment(
         Download the GO annotations even if they have been downloaded before?
     progress : bool, optional
         Show a progress bar during enrichment tests?
-
+    annotations: pandas.DataFrame, optional
+        A custom annotations dataframe.
+    mapping: defaultdict, optional
+        A custom mapping of the GO term relationships.
+    aggregate_terms : bool, optional
+        Aggregate the terms and do the tree search.
     Returns
     -------
     pandas.DataFrame
         The adjusted p-value for each tested GO term in each sample.
     """
     LOGGER.info("Retrieving GO annotations...")
-    annot, mapping = load_annotations(
-        species=species,
-        aspect=aspect,
-        release=release,
-        fetch=fetch,
-    )
+
+    if annotations is not None:
+        annot = annotations
+    else:
+        annot, map = load_annotations(
+            species=species,
+            aspect=aspect,
+            release=release,
+            fetch=fetch,
+        )
+        if not mapping:
+            mapping = map
 
     if go_subset:
-        if aggregate_terms:
+        if aggregate_terms and mapping:
             annot = tree_search(mapping, go_subset, annot)
 
         in_names = annot["go_name"].isin(go_subset)
@@ -119,7 +132,7 @@ def test_enrichment(
         if res != None:
             results.append(list(term) + list(res[1]))
 
-    cols = ["GO Accession", "GO Name", "GO Aspect"] + list(proteins.columns)
+    cols = ["GO ID", "GO Name", "GO Aspect"] + list(proteins.columns)
     results = pd.DataFrame(results, columns=cols)
     results.loc[:, proteins.columns] = results.loc[:, proteins.columns].apply(
         adjust_pvals, raw=True
