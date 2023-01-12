@@ -1,11 +1,11 @@
 """Calculate the enrichments for a collection of experiments."""
 import logging
 
-import numpy as np
 import pandas as pd
-from scipy import stats
 from statsmodels.stats import multitest
 from tqdm.auto import tqdm
+from .stats import mannwhitneyu
+from .tree_search import tree_search
 
 from .annotations import load_annotations
 
@@ -22,12 +22,15 @@ def test_enrichment(
     contaminants_filter=None,
     fetch=False,
     progress=False,
+    annotations=None,
+    mapping=None,
+    aggregate_terms=True,
 ):
     """Test for the enrichment of Gene Ontology terms from protein abundance.
 
     The Mann-Whitney U Test is applied to each column of proteins dataframe and
     for each Gene Ontology (GO) term. The p-values are then corrected for
-    multiple hypothesis testing accross all of the columns using the
+    multiple hypothesis testing across all of the columns using the
     Benjamini-Hochberg procedure.
 
     Parameters
@@ -61,21 +64,35 @@ def test_enrichment(
         Download the GO annotations even if they have been downloaded before?
     progress : bool, optional
         Show a progress bar during enrichment tests?
-
+    annotations: pandas.DataFrame, optional
+        A custom annotations dataframe.
+    mapping: defaultdict, optional
+        A custom mapping of the GO term relationships.
+    aggregate_terms : bool, optional
+        Aggregate the terms and do the tree search.
     Returns
     -------
     pandas.DataFrame
         The adjusted p-value for each tested GO term in each sample.
     """
     LOGGER.info("Retrieving GO annotations...")
-    annot = load_annotations(
-        species=species,
-        aspect=aspect,
-        release=release,
-        fetch=fetch,
-    )
+
+    if annotations is not None:
+        annot = annotations
+    else:
+        annot, map = load_annotations(
+            species=species,
+            aspect=aspect,
+            release=release,
+            fetch=fetch,
+        )
+        if not mapping:
+            mapping = map
 
     if go_subset:
+        if aggregate_terms and mapping:
+            annot = tree_search(mapping, go_subset, annot)
+
         in_names = annot["go_name"].isin(go_subset)
         in_ids = annot["go_id"].isin(go_subset)
         annot = annot.loc[in_names | in_ids, :]
@@ -89,6 +106,7 @@ def test_enrichment(
             ~accessions["uniprot_accession"].isin(contaminants_filter)
         ]
 
+    # Get the GO terms and proteins
     annot = accessions.merge(annot, how="inner")
     n_prot = proteins.shape[1]
     proteins = pd.DataFrame(proteins).loc[annot["uniprot_accession"], :]
@@ -106,17 +124,20 @@ def test_enrichment(
     for term, accessions in tqdm(
         annot.groupby(grp_cols), disable=not progress
     ):
+
         in_term = proteins.index.isin(accessions["uniprot_accession"].unique())
         in_vals = proteins[in_term].to_numpy()
         out_vals = proteins[~in_term].to_numpy()
-        res = stats.mannwhitneyu(in_vals, out_vals, alternative="greater")
-        results.append(list(term) + list(res[1]))
+        res = mannwhitneyu(in_vals, out_vals, alternative="greater")
+        if res != None:
+            results.append(list(term) + list(res[1]))
 
-    cols = ["GO Accession", "GO Name", "GO Aspect"] + list(proteins.columns)
+    cols = ["GO ID", "GO Name", "GO Aspect"] + list(proteins.columns)
     results = pd.DataFrame(results, columns=cols)
     results.loc[:, proteins.columns] = results.loc[:, proteins.columns].apply(
         adjust_pvals, raw=True
     )
+
     return results
 
 

@@ -3,6 +3,7 @@ import requests
 import pandas as pd
 
 from . import utils, config, ontologies
+import uuid
 
 SPECIES = {
     "yeast": "sgd",
@@ -10,6 +11,41 @@ SPECIES = {
     "human": "goa_human",
     "homo sapiens": "goa_human",
 }
+
+
+def generate_annotations(proteins, aspect, go_name, go_id=None):
+    """Generate an annotation file for a list of proteins that are correlated to a single term and aspect.
+
+    The term can be in the GO database or a new term.
+
+    Parameters
+    ----------
+    proteins : list
+        List of proteins that will be annotated to a term.
+    aspect: str
+        String specifying the aspect the term is in ("C", "F", "P").
+    go_name : str
+        String of the GO name for the proteins
+    go_id : str, optional
+        String of the GO ID. If in the GO database, the go id and go name should match the database.
+
+    Returns
+    -------
+    pandas.DataFrame
+        An annotations dataframe with a single go term.
+    """
+    if not go_id:
+        # Generate a unique GO ID if one is not given
+        go_id = "GO:" + str(uuid.uuid4().int)
+    # Create the annotations df
+    data = {
+        "uniprot_accession": proteins,
+        "go_id": go_id,
+        "aspect": aspect,
+        "go_name": go_name,
+    }
+    annot = pd.DataFrame.from_dict(data)
+    return annot
 
 
 def download_annotations(stem, release="current", fetch=False):
@@ -71,7 +107,7 @@ def load_annotations(species, aspect="all", release="current", fetch=False):
 
     Returns
     -------
-    dict of str: list of str
+    dict of str: list of str -- actually a dictionary
         A mapping of GO terms (keys) to Uniprot accessions with that
         annotation.
     """
@@ -105,7 +141,7 @@ def load_annotations(species, aspect="all", release="current", fetch=False):
         "gene_product_form_id",
     ]
 
-    terms = ontologies.load_ontology()
+    terms, mapping = ontologies.load_ontology()
     species = SPECIES.get(species.lower(), species.lower())
     annot_file = download_annotations(species, release=release, fetch=fetch)
     annot = pd.read_table(
@@ -128,4 +164,4 @@ def load_annotations(species, aspect="all", release="current", fetch=False):
     keep = ["uniprot_accession", "go_id", "aspect"]
     annot = annot.loc[:, keep].drop_duplicates()
     annot["go_name"] = annot["go_id"].map(terms)
-    return annot
+    return annot, mapping
