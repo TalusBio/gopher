@@ -149,7 +149,7 @@ def load_annotations(species, aspect="all", release="current", fetch=False):
         comment="!",
         header=None,
         names=cols,
-        low_memory=False,
+        # low_memory=False,
     )
 
     if aspect is not None:
