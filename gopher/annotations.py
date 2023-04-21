@@ -1,6 +1,7 @@
 """Get GO annotations."""
 import requests
 import pandas as pd
+import polars as pl
 
 from . import utils, config, ontologies
 import uuid
@@ -144,13 +145,15 @@ def load_annotations(species, aspect="all", release="current", fetch=False):
     terms, mapping = ontologies.load_ontology()
     species = SPECIES.get(species.lower(), species.lower())
     annot_file = download_annotations(species, release=release, fetch=fetch)
-    annot = pd.read_table(
+
+    polars_annot = pl.read_csv(
         annot_file,
-        comment="!",
-        header=None,
-        names=cols,
-        low_memory=False,
+        separator="\t",
+        comment_char="!",
+        has_header=False,
+        new_columns=cols,
     )
+    annot = polars_annot.to_pandas()
 
     if aspect is not None:
         annot = annot.loc[annot["aspect"] == aspect, :]
