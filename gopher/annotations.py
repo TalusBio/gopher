@@ -84,7 +84,8 @@ def download_annotations(stem, release="current", fetch=False):
         out_file.parent.mkdir(exist_ok=True, parents=True)
         utils.http_download(url + fname, out_file)
 
-    # Decompress file if it ends with gz
+    # Decompressing the file, since it will be downloaded only once
+    # but read many times.
     target = Path(str(out_file).replace(".gz", ""))
     if not target.exists():
         out_file = utils.decompress(out_file, target)
@@ -160,7 +161,6 @@ def load_annotations(species, aspect="all", release="current", fetch=False):
         "db",
         "gene_product_form_id",
     ]
-    # I decompressed the file manually just to see how much faster or efficient it would be
     polars_annot = pl.scan_csv(
         annot_file,
         separator="\t",
@@ -169,7 +169,6 @@ def load_annotations(species, aspect="all", release="current", fetch=False):
         new_columns=cols,
     )
     polars_annot = polars_annot.select(keep)
-    # polars_annot = pl.read_csv( annot_file, separator="\t", comment_char="!", has_header=False, new_columns=new_cols, columns=cols_keep)
 
     if aspect is not None:
         polars_annot = polars_annot.filter(pl.col("aspect") == aspect)
