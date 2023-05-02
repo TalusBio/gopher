@@ -124,7 +124,6 @@ def test_enrichment(
     for term, accessions in tqdm(
         annot.groupby(grp_cols), disable=not progress
     ):
-
         in_term = proteins.index.isin(accessions["uniprot_accession"].unique())
         in_vals = proteins[in_term].to_numpy()
         out_vals = proteins[~in_term].to_numpy()
