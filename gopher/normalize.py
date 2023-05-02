@@ -2,7 +2,7 @@ import pandas as pd
 from Bio import SeqIO, SeqUtils
 
 
-def normalize(proteins, fasta):
+def normalize_values(proteins, fasta):
     """Normalize intensity values.
 
     Normalize using the proteomic ruler approach outlined by Wiśniewski et al.

@@ -18,3 +18,12 @@ except ImportError:
 from .config import get_data_dir, set_data_dir
 from .parsers import read_encyclopedia, read_metamorpheus
 from .enrichment import test_enrichment
+from .annotations import generate_annotations, load_annotations
+from .display_data import (
+    map_proteins,
+    get_rankings,
+    get_annotations,
+    in_term,
+    roc,
+)
+from .normalize import normalize_values
