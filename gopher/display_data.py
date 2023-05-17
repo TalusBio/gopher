@@ -214,16 +214,19 @@ def roc(
     plot
         Plot of ROC curve for a GO term
     """
+    from .stats import rankdata
+
     # Get a list of the samples
     samples = proteins.columns
     # Get annotations
     annot = get_annotations(proteins, aspect, species, release, fetch)
+
     # Rank the data based on the go term
     proteins = in_term(proteins, go_term, annot)
-    # Get the number of positive and negative cases
-    # n_pos = sum(proteins["in_term"])
-    # n_neg = len(proteins) - n_pos
 
+    # Get the number of positive and negative cases
+    n_pos = sum(proteins["in_term"])
+    n_neg = len(proteins) - n_pos
     # Set up plot
     fig, axs = plt.subplots(1, len(samples), figsize=(13, 4.5))
     i = 0
@@ -231,11 +234,9 @@ def roc(
     # Graph the ROC curve for each sample
     for sample in samples:
         # Sort values
-        sorted = proteins.sort_values(sample, ascending=False)
+        proteins["ranks"] = proteins[sample].rank()
+        sorted = proteins.sort_values("ranks", ascending=False)
         # Filter for proteins that are high abundance
-        sorted = sorted[sorted[sample] > 1000000]
-        n_pos = sum(sorted["in_term"])
-        n_neg = len(sorted) - n_pos
 
         # Calculate TPR and FPR
         sorted["tpr"] = sorted["in_term"].cumsum() / sorted["in_term"].sum()
