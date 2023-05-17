@@ -1,5 +1,6 @@
 import pandas as pd
 from Bio import SeqIO, SeqUtils
+from loguru import logger
 
 
 def normalize_values(proteins, fasta):
@@ -37,7 +38,10 @@ def read_fasta(fasta):
     fasta_df = []
     for entry in SeqIO.parse(open(fasta), "fasta"):
         name = entry.id.split("|")[1]
-        mass = SeqUtils.molecular_weight(entry.seq, seq_type="protein")
+        try:
+            mass = SeqUtils.molecular_weight(entry.seq, seq_type="protein")
+        except:
+            logger.warning("Ambiguous peptide in {}".format(name))
         temp = pd.DataFrame(
             {"Protein": name, "Sequence": str(entry.seq), "Mass": mass},
             index=[0],

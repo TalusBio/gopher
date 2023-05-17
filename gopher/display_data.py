@@ -221,8 +221,8 @@ def roc(
     # Rank the data based on the go term
     proteins = in_term(proteins, go_term, annot)
     # Get the number of positive and negative cases
-    n_pos = sum(proteins["in_term"])
-    n_neg = len(proteins) - n_pos
+    # n_pos = sum(proteins["in_term"])
+    # n_neg = len(proteins) - n_pos
 
     # Set up plot
     fig, axs = plt.subplots(1, len(samples), figsize=(13, 4.5))
@@ -232,6 +232,10 @@ def roc(
     for sample in samples:
         # Sort values
         sorted = proteins.sort_values(sample, ascending=False)
+        # Filter for proteins that are high abundance
+        sorted = sorted[sorted[sample] > 1000000]
+        n_pos = sum(sorted["in_term"])
+        n_neg = len(sorted) - n_pos
 
         # Calculate TPR and FPR
         sorted["tpr"] = sorted["in_term"].cumsum() / sorted["in_term"].sum()
@@ -245,22 +249,22 @@ def roc(
 
         # Graph ROC curve
         ax = axs[i]
-        p = sns.lineplot(x=fpr, y=tpr, drawstyle="steps-pre", ci=None, ax=ax)
+        p = sns.lineplot(x=fpr, y=tpr, drawstyle="steps-post", ci=None, ax=ax)
         sns.lineplot(
             x=(0, 1), y=(0, 1), color="black", linestyle="dashed", ax=ax
         )
         ax.title.set_text(sample)
-        ax.set_xlabel("False Positive Rate (FPR)")
-        ax.set_ylabel("True Positive Rate (TPR)")
+        ax.set_xlabel("FPR")
+        ax.set_ylabel("TPR")
 
         # Calculate AUC and put on graph in lower right corner
         U, _ = stats.mannwhitneyu(
-            proteins.loc[proteins["in_term"], sample],
-            proteins.loc[~proteins["in_term"], sample],
+            sorted.loc[sorted["in_term"], sample],
+            sorted.loc[~sorted["in_term"], sample],
         )
         auc = U / (n_pos * n_neg)
         auc = "AUC = " + str(round(auc, 3))
-        p.annotate(auc, xy=(0.75, 0))
+        p.annotate(auc, xy=(0.5, 0))
 
         i += 1
 
