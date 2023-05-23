@@ -214,8 +214,6 @@ def roc(
     plot
         Plot of ROC curve for a GO term
     """
-    from .stats import rankdata
-
     # Get a list of the samples
     samples = proteins.columns
     # Get annotations
@@ -227,6 +225,7 @@ def roc(
     # Get the number of positive and negative cases
     n_pos = sum(proteins["in_term"])
     n_neg = len(proteins) - n_pos
+
     # Set up plot
     fig, axs = plt.subplots(1, len(samples), figsize=(13, 4.5))
     i = 0
@@ -234,9 +233,7 @@ def roc(
     # Graph the ROC curve for each sample
     for sample in samples:
         # Sort values
-        proteins["ranks"] = proteins[sample].rank()
-        sorted = proteins.sort_values("ranks", ascending=False)
-        # Filter for proteins that are high abundance
+        sorted = proteins.sort_values(sample, ascending=False)
 
         # Calculate TPR and FPR
         sorted["tpr"] = sorted["in_term"].cumsum() / sorted["in_term"].sum()
@@ -255,8 +252,8 @@ def roc(
             x=(0, 1), y=(0, 1), color="black", linestyle="dashed", ax=ax
         )
         ax.title.set_text(sample)
-        ax.set_xlabel("FPR")
-        ax.set_ylabel("TPR")
+        ax.set_xlabel("False Positive Rate (FPR)")
+        ax.set_ylabel("True Positive Rate (TPR)")
 
         # Calculate AUC and put on graph in lower right corner
         U, _ = stats.mannwhitneyu(
@@ -265,7 +262,7 @@ def roc(
         )
         auc = U / (n_pos * n_neg)
         auc = "AUC = " + str(round(auc, 3))
-        p.annotate(auc, xy=(0.5, 0))
+        p.annotate(auc, xy=(0.75, 0))
 
         i += 1
 
