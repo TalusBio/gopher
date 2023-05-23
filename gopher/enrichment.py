@@ -5,7 +5,7 @@ import pandas as pd
 from statsmodels.stats import multitest
 from tqdm.auto import tqdm
 from .stats import mannwhitneyu
-from .tree_search import tree_search
+from .graph_search import graph_search
 
 from .annotations import load_annotations
 
@@ -69,7 +69,7 @@ def test_enrichment(
     mapping: defaultdict, optional
         A custom mapping of the GO term relationships.
     aggregate_terms : bool, optional
-        Aggregate the terms and do the tree search.
+        Aggregate the terms and do the graph search.
     Returns
     -------
     pandas.DataFrame
@@ -91,7 +91,7 @@ def test_enrichment(
 
     if go_subset:
         if aggregate_terms and mapping:
-            annot = tree_search(mapping, go_subset, annot)
+            annot = graph_search(mapping, go_subset, annot)
 
         in_names = annot["go_name"].isin(go_subset)
         in_ids = annot["go_id"].isin(go_subset)

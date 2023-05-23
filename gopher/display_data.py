@@ -1,7 +1,6 @@
 from .annotations import load_annotations
 import pandas as pd
 import logging
-from tqdm.auto import tqdm
 from .stats import rankdata
 import numpy as np
 import matplotlib.pyplot as plt
