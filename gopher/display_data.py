@@ -230,7 +230,6 @@ def roc(
 
     # Graph the ROC curve for each sample
     for sample in samples:
-
         # Sort values
         sorted = proteins.sort_values(sample, ascending=False)
 

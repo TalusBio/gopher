@@ -1,5 +1,6 @@
 """Utility functions"""
 import socket
+import gzip
 from pathlib import Path
 
 import requests
@@ -34,3 +35,20 @@ def http_download(url, path):
         ) as err:
             path.unlink()
             raise err
+
+
+def decompress(gz_file, target_file):
+    """Decompress a gzipped file.
+
+    Parameters
+    ----------
+    gz_file : Path
+        The path to the gzipped file.
+    target_file : Path
+        The path to the decompressed file.
+    """
+    with gzip.open(gz_file, "rb") as gz_ref:
+        with target_file.open("wb") as out_ref:
+            out_ref.write(gz_ref.read())
+
+    return target_file

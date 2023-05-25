@@ -1,4 +1,5 @@
 """Get GO annotations."""
+from pathlib import Path
 import requests
 import pandas as pd
 import polars as pl
@@ -79,11 +80,18 @@ def download_annotations(stem, release="current", fetch=False):
         url = f"http://release.geneontology.org/{release}/annotations/"
 
     out_file = config.get_data_dir() / "annotations" / release / fname
-    if out_file.exists() and not fetch:
-        return out_file
+    if (not out_file.exists()) or fetch:
+        out_file.parent.mkdir(exist_ok=True, parents=True)
+        utils.http_download(url + fname, out_file)
 
-    out_file.parent.mkdir(exist_ok=True, parents=True)
-    utils.http_download(url + fname, out_file)
+    # Decompressing the file, since it will be downloaded only once
+    # but read many times.
+    target = Path(str(out_file).replace(".gz", ""))
+    if not target.exists():
+        out_file = utils.decompress(out_file, target)
+    else:
+        out_file = target
+
     return out_file
 
 
@@ -146,25 +154,44 @@ def load_annotations(species, aspect="all", release="current", fetch=False):
     species = SPECIES.get(species.lower(), species.lower())
     annot_file = download_annotations(species, release=release, fetch=fetch)
 
-    polars_annot = pl.read_csv(
+    keep = [
+        "uniprot_accession",
+        "go_id",
+        "aspect",
+        "db",
+        "gene_product_form_id",
+    ]
+    polars_annot = pl.scan_csv(
         annot_file,
         separator="\t",
         comment_char="!",
         has_header=False,
         new_columns=cols,
     )
-    annot = polars_annot.to_pandas()
+    polars_annot = polars_annot.select(keep)
 
     if aspect is not None:
-        annot = annot.loc[annot["aspect"] == aspect, :]
+        polars_annot = polars_annot.filter(pl.col("aspect") == aspect)
 
-    uniprot = annot["db"] == "UniProtKB"
-    if not uniprot.all():
-        annot.loc[~uniprot, "uniprot_accession"] = annot.loc[
-            ~uniprot, "gene_product_form_id"
-        ].str.extract(r"UniProtKB:(.+)", expand=False)
+    polars_annot = polars_annot.with_columns(
+        [
+            pl.when(pl.col("db").eq("UniProtKB"))
+            .then(pl.col("uniprot_accession"))
+            .otherwise(
+                pl.col("gene_product_form_id")
+                .fill_null("")
+                .str.extract(r"UniProtKB:(.+)", 1)
+            )
+            .alias("uniprot_accession")
+        ],
+    )
 
-    keep = ["uniprot_accession", "go_id", "aspect"]
-    annot = annot.loc[:, keep].drop_duplicates()
-    annot["go_name"] = annot["go_id"].map(terms)
+    polars_annot = (
+        polars_annot.select(["uniprot_accession", "go_id", "aspect"])
+        .unique()
+        .with_columns(pl.col("go_id").map_dict(terms).alias("go_name"))
+    )
+
+    annot = polars_annot.collect().to_pandas()
+
     return annot, mapping
