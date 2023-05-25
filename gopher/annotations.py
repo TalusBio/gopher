@@ -195,7 +195,3 @@ def load_annotations(species, aspect="all", release="current", fetch=False):
     annot = polars_annot.collect().to_pandas()
 
     return annot, mapping
-
-
-if __name__ == "__main__":
-    load_annotations("human", aspect="all", release="current", fetch=False)
