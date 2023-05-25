@@ -42,7 +42,7 @@ def test_tree_search(generate_annotations, generate_mapping):
 
 def test_enrichment_tree_search(generate_proteins):
     """Tests the tree search algorithm.
-    
+
     Check that the test enrichment function works with the incorporated tree algorithm
     and gives you different results from the enrichment without the tree algorithm.
     """
