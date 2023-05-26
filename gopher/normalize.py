@@ -1,9 +1,10 @@
 import pandas as pd
 from Bio import SeqIO, SeqUtils
 from loguru import logger
+from pathlib import Path
 
 
-def normalize_values(proteins, fasta):
+def normalize_values(proteins: pd.DataFrame, fasta: Path):
     """Normalize intensity values.
 
     Normalize using the proteomic ruler approach outlined by Wiśniewski et al.
@@ -34,7 +35,19 @@ def normalize_values(proteins, fasta):
     return df
 
 
-def read_fasta(fasta):
+def read_fasta(fasta: Path):
+    """Read a fasta file into a dataframe with relevant columns
+
+    Parameters
+    ----------
+    fasta : Path
+        Use the FASTA file to read and generate molecular weights
+
+    Returns
+    -------
+    pandas.DataFrame
+        The fasta dataframe with relevant columns.
+    """
     fasta_df = []
     for entry in SeqIO.parse(open(fasta), "fasta"):
         name = entry.id.split("|")[1]

@@ -11,11 +11,11 @@ LOGGER = logging.getLogger(__name__)
 
 
 def map_proteins(
-    protein_list,
-    aspect="all",
-    species="human",
-    release="current",
-    fetch=False,
+    protein_list: list,
+    aspect: str = "all",
+    species: str = "human",
+    release: str = "current",
+    fetch: bool = False,
 ):
     """Map the proteins to the GO terms
 
@@ -51,12 +51,12 @@ def map_proteins(
 
 
 def get_rankings(
-    proteins,
-    go_term,
-    aspect="all",
-    species="human",
-    release="current",
-    fetch=False,
+    proteins: pd.DataFrame,
+    go_term: str,
+    aspect: str = "all",
+    species: str = "human",
+    release: str = "current",
+    fetch: bool = False,
 ):
     """Rank the proteins and show whether proteins are in a specified term
 
@@ -97,12 +97,12 @@ def get_rankings(
 
 
 def get_annotations(
-    proteins,
-    aspect="all",
-    species="human",
-    release="current",
-    fetch=False,
-    go_subset=None,
+    proteins: pd.DataFrame,
+    aspect: str = "all",
+    species: str = "human",
+    release: str = "current",
+    fetch: bool = False,
+    go_subset: list = None,
 ):
     """Gets the annotations for proteins in a dataset
 
@@ -154,7 +154,7 @@ def get_annotations(
     return annot
 
 
-def in_term(proteins, go_term, annot):
+def in_term(proteins: pd.DataFrame, go_term: str, annot: pd.DataFrame):
     """See if proteins are associated with a specific term
 
     Parameters
@@ -180,12 +180,12 @@ def in_term(proteins, go_term, annot):
 
 
 def roc(
-    proteins,
-    go_term,
-    aspect="all",
-    species="human",
-    release="current",
-    fetch=False,
+    proteins: pd.DataFrame,
+    go_term: str,
+    aspect: str = "all",
+    species: str = "human",
+    release: str = "current",
+    fetch: bool = False,
 ):
     """Plot the ROC curve for a go term in each sample
 

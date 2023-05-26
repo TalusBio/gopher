@@ -3,7 +3,7 @@ import pandas as pd
 from collections import defaultdict
 
 
-def graph_search(mapping, go_subset, annot):
+def graph_search(mapping: dict, go_subset: list, annot: pd.DataFrame):
     """Incorporates the graph search to get all children from parent node.
 
     First, get the GO IDs for the terms of interest. Run the graph search algorithm to
@@ -33,7 +33,7 @@ def graph_search(mapping, go_subset, annot):
     return new_annot
 
 
-def new_map(mapping, subset):
+def new_map(mapping: dict, subset: list):
     """Graph search algorithm that gets all children nodes (or terms) from the specified parent.
 
     Parameters
@@ -58,7 +58,7 @@ def new_map(mapping, subset):
     return subset_mapping
 
 
-def map(term, mapping):
+def map(term: str, mapping: dict):
     """Graph search recursive helper function that gets all children nodes (or terms) from the specified parent.
 
     Parameters
@@ -89,7 +89,7 @@ def map(term, mapping):
     return result
 
 
-def update_graph(mapping, annot):
+def update_graph(mapping: dict, annot: pd.DataFrame):
     """Graph search algorithm that gets all children nodes (or terms) from the specified parent.
 
     Parameters

@@ -2,6 +2,7 @@
 import logging
 
 import pandas as pd
+import numpy as np
 from statsmodels.stats import multitest
 from tqdm.auto import tqdm
 from .stats import mannwhitneyu
@@ -13,18 +14,19 @@ LOGGER = logging.getLogger(__name__)
 
 
 def test_enrichment(
-    proteins,
-    desc=True,
-    aspect="all",
-    species="human",
-    release="current",
-    go_subset=None,
-    contaminants_filter=None,
-    fetch=False,
-    progress=False,
-    annotations=None,
-    mapping=None,
-    aggregate_terms=True,
+    proteins: pd.DataFrame,
+    desc: bool = True,
+    aspect: str = "all",
+    species: str = "human",
+    release: str = "current",
+    go_subset: list = None,
+    contaminants_filter: list = None,
+    fetch: bool = False,
+    progress: bool = False,
+    annotations: pd.DataFrame = None,
+    mapping: dict = None,
+    aggregate_terms: bool = True,
+    alternative: str = "greater",
 ):
     """Test for the enrichment of Gene Ontology terms from protein abundance.
 
@@ -70,6 +72,10 @@ def test_enrichment(
         A custom mapping of the GO term relationships.
     aggregate_terms : bool, optional
         Aggregate the terms and do the graph search.
+    alternative : str, {"greater", "less", "two-sided"} optional
+        Type of test that should be run.
+        Could be "greater", "less", or "two-sided".
+
     Returns
     -------
     pandas.DataFrame
@@ -127,7 +133,7 @@ def test_enrichment(
         in_term = proteins.index.isin(accessions["uniprot_accession"].unique())
         in_vals = proteins[in_term].to_numpy()
         out_vals = proteins[~in_term].to_numpy()
-        res = mannwhitneyu(in_vals, out_vals, alternative="greater")
+        res = mannwhitneyu(in_vals, out_vals, alternative)
         if res != None:
             results.append(list(term) + list(res[1]))
 
@@ -140,7 +146,7 @@ def test_enrichment(
     return results
 
 
-def adjust_pvals(pvals):
+def adjust_pvals(pvals: np.ndarray):
     """Compute BH adjusted p-values.
 
     Paramerters
