@@ -100,7 +100,7 @@ The term can be in the GO database or a new term.
 
 List of proteins (UniProtKB accessions) that will be annotated to a term.
 
->aspect: str
+> aspect: str
 
 String specifying the aspect the term is in ("C", "F", "P").
 
