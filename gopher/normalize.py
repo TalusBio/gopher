@@ -24,10 +24,9 @@ def normalize_values(proteins: pd.DataFrame, fasta: Path):
         The normalized intensities for every protein in each sample.
     """
     fasta_df = read_fasta(fasta)
-
+    fasta_df = fasta_df.set_index("Protein")
     proteins = proteins.apply(col_norm, axis=0)
-    df = pd.merge(fasta_df, proteins, on="Protein")
-    df = df.set_index("Protein")
+    df = proteins.join(fasta_df)
     df = df.drop(columns=["Sequence"])
     df = df.apply(mass_norm, axis=1)
     df = df.drop(columns=["Mass"])
