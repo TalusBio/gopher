@@ -1,6 +1,7 @@
 import copy
-import pandas as pd
 from collections import defaultdict
+
+import pandas as pd
 
 
 def graph_search(mapping: dict, go_subset: list, annot: pd.DataFrame):

@@ -1,14 +1,14 @@
 """Calculate the enrichments for a collection of experiments."""
 import logging
 
-import pandas as pd
 import numpy as np
+import pandas as pd
 from statsmodels.stats import multitest
 from tqdm.auto import tqdm
-from .stats import mannwhitneyu
-from .graph_search import graph_search
 
 from .annotations import load_annotations
+from .graph_search import graph_search
+from .stats import mannwhitneyu
 
 LOGGER = logging.getLogger(__name__)
 

@@ -1,10 +1,11 @@
 """Get GO annotations."""
-import requests
-import pandas as pd
-
-from pathlib import Path
-from . import utils, config, ontologies
 import uuid
+from pathlib import Path
+
+import pandas as pd
+import requests
+
+from . import config, ontologies, utils
 
 SPECIES = {
     "yeast": "sgd",

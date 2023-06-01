@@ -1,6 +1,6 @@
 """This module contains the configuration details for ppx"""
-import os
 import logging
+import os
 from pathlib import Path
 
 LOGGER = logging.getLogger(__name__)

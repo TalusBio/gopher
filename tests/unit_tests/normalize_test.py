@@ -1,8 +1,10 @@
-import pytest
 from pathlib import Path
-import pandas as pd
-from gopher import normalize
+
 import numpy as np
+import pandas as pd
+import pytest
+
+from gopher import normalize
 
 
 @pytest.fixture

@@ -1,7 +1,7 @@
 """Numba Mann-Whitney U test"""
+import numba as nb
 import numpy as np
 from scipy import stats
-import numba as nb
 
 
 @nb.njit(parallel=True)
@@ -69,7 +69,8 @@ def rankdata(data: np.ndarray) -> np.ndarray:
 def mannwhitneyu(
     x: np.ndarray, y: np.ndarray, alternative: str = "two-sided"
 ) -> int:
-    """Numba version of the Mann-Whitney U-test.
+    """Mann-Whitney U test incorporating numba versions of the ranking and tie
+    correction functions.
 
     Parameters
     ----------
