@@ -53,8 +53,10 @@ def test_enrichment_graph_search(generate_proteins):
         "heterochromatin",
         "cytoplasm",
     ]
-    result_orig = enrichment.test_enrichment(df, go_subset=terms)
+    result_orig = enrichment.test_enrichment(
+        df, go_subset=terms, aggregate_terms=False
+    )
     result_graph_search = enrichment.test_enrichment(
         df, go_subset=terms, aggregate_terms=True
     )
-    assert result_orig.equals(result_graph_search)
+    assert not result_orig.equals(result_graph_search)
