@@ -1,7 +1,6 @@
 import pandas as pd
 
-from gopher import graph_search
-from gopher import enrichment
+from gopher import enrichment, graph_search
 
 
 def test_graph_mapping(generate_mapping):

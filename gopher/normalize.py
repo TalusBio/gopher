@@ -1,7 +1,8 @@
+from pathlib import Path
+
 import pandas as pd
 from Bio import SeqIO, SeqUtils
 from loguru import logger
-from pathlib import Path
 
 
 def normalize_values(proteins: pd.DataFrame, fasta: Path):

@@ -1,11 +1,13 @@
-from .annotations import load_annotations
-import pandas as pd
 import logging
-from .stats import rankdata
-import numpy as np
+
 import matplotlib.pyplot as plt
-from scipy import stats
+import numpy as np
+import pandas as pd
 import seaborn as sns
+from scipy import stats
+
+from .annotations import load_annotations
+from .stats import rankdata
 
 LOGGER = logging.getLogger(__name__)
 

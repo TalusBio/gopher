@@ -7,18 +7,17 @@ We need:
 - A mock FTP server response from PRIDE
 - A mock FTP server response from MassIVE
 """
-import json
-import socket
 import ftplib
+import json
 import random
-import pandas as pd
-import numpy as np
+import socket
 import string
 
+import numpy as np
+import pandas as pd
+import ppx
 import pytest
 import requests
-
-import ppx
 
 
 # Set the PPX_DATA_DIRECTORY --------------------------------------------------
