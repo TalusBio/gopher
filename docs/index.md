@@ -6,6 +6,8 @@ Gopher uses a Mann-Whitney U Test to look for enriched gene ontology terms that 
 
 ![An overview of gopher's Mann-Whitney U Test](static/mann_whitney_u.png){: style="width:800px"}
 
+## Installation
+
 Gopher can be pip installed directly from GitHub:
 
 ```python
