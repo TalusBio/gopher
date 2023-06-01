@@ -1,13 +1,14 @@
 import copy
-import pandas as pd
 from collections import defaultdict
 
+import pandas as pd
 
-def tree_search(mapping, go_subset, annot):
-    """Incorporates the tree search to get all children from parent node.
 
-    First, get the GO IDs for the terms of interest. Run the tree algorithm to
-    get the updated tree mapping. Update the tree to reflect the new mapping.
+def graph_search(mapping: dict, go_subset: list, annot: pd.DataFrame):
+    """Incorporates the graph search to get all children from parent node.
+
+    First, get the GO IDs for the terms of interest. Run the graph search algorithm to
+    get the updated mapping. Update the graph to reflect the new mapping.
 
     Parameters
     ----------
@@ -27,14 +28,14 @@ def tree_search(mapping, go_subset, annot):
     in_ids = annot["go_id"].isin(go_subset)
     subset = annot.loc[in_names | in_ids, :]["go_id"].unique().tolist()
     # Get the new mapping for the subset of terms with all the children associated with each term
-    new_mapping = new_tree_map(mapping, subset)
+    new_mapping = new_map(mapping, subset)
     # Incorporate the new mapping into the graph and return the updated graph
-    new_annot = update_tree(new_mapping, annot)
+    new_annot = update_graph(new_mapping, annot)
     return new_annot
 
 
-def new_tree_map(mapping, subset):
-    """Tree search algorithm that gets all children nodes (or terms) from the specified parent.
+def new_map(mapping: dict, subset: list):
+    """Graph search algorithm that gets all children nodes (or terms) from the specified parent.
 
     Parameters
     ----------
@@ -58,8 +59,8 @@ def new_tree_map(mapping, subset):
     return subset_mapping
 
 
-def map(term, mapping):
-    """Tree search recursive helper function that gets all children nodes (or terms) from the specified parent.
+def map(term: str, mapping: dict):
+    """Graph search recursive helper function that gets all children nodes (or terms) from the specified parent.
 
     Parameters
     ----------
@@ -89,8 +90,8 @@ def map(term, mapping):
     return result
 
 
-def update_tree(mapping, annot):
-    """Tree search algorithm that gets all children nodes (or terms) from the specified parent.
+def update_graph(mapping: dict, annot: pd.DataFrame):
+    """Graph search algorithm that gets all children nodes (or terms) from the specified parent.
 
     Parameters
     ----------

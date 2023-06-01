@@ -1,22 +1,23 @@
-from .annotations import load_annotations
-import pandas as pd
 import logging
-from tqdm.auto import tqdm
-from .stats import rankdata
-import numpy as np
+
 import matplotlib.pyplot as plt
-from scipy import stats
+import numpy as np
+import pandas as pd
 import seaborn as sns
+from scipy import stats
+
+from .annotations import load_annotations
+from .stats import rankdata
 
 LOGGER = logging.getLogger(__name__)
 
 
 def map_proteins(
-    protein_list,
-    aspect="all",
-    species="human",
-    release="current",
-    fetch=False,
+    protein_list: list,
+    aspect: str = "all",
+    species: str = "human",
+    release: str = "current",
+    fetch: bool = False,
 ):
     """Map the proteins to the GO terms
 
@@ -52,12 +53,12 @@ def map_proteins(
 
 
 def get_rankings(
-    proteins,
-    go_term,
-    aspect="all",
-    species="human",
-    release="current",
-    fetch=False,
+    proteins: pd.DataFrame,
+    go_term: str,
+    aspect: str = "all",
+    species: str = "human",
+    release: str = "current",
+    fetch: bool = False,
 ):
     """Rank the proteins and show whether proteins are in a specified term
 
@@ -98,12 +99,12 @@ def get_rankings(
 
 
 def get_annotations(
-    proteins,
-    aspect="all",
-    species="human",
-    release="current",
-    fetch=False,
-    go_subset=None,
+    proteins: pd.DataFrame,
+    aspect: str = "all",
+    species: str = "human",
+    release: str = "current",
+    fetch: bool = False,
+    go_subset: list = None,
 ):
     """Gets the annotations for proteins in a dataset
 
@@ -155,7 +156,7 @@ def get_annotations(
     return annot
 
 
-def in_term(proteins, go_term, annot):
+def in_term(proteins: pd.DataFrame, go_term: str, annot: pd.DataFrame):
     """See if proteins are associated with a specific term
 
     Parameters
@@ -181,12 +182,12 @@ def in_term(proteins, go_term, annot):
 
 
 def roc(
-    proteins,
-    go_term,
-    aspect="all",
-    species="human",
-    release="current",
-    fetch=False,
+    proteins: pd.DataFrame,
+    go_term: str,
+    aspect: str = "all",
+    species: str = "human",
+    release: str = "current",
+    fetch: bool = False,
 ):
     """Plot the ROC curve for a go term in each sample
 
@@ -218,8 +219,10 @@ def roc(
     samples = proteins.columns
     # Get annotations
     annot = get_annotations(proteins, aspect, species, release, fetch)
+
     # Rank the data based on the go term
     proteins = in_term(proteins, go_term, annot)
+
     # Get the number of positive and negative cases
     n_pos = sum(proteins["in_term"])
     n_neg = len(proteins) - n_pos
@@ -230,7 +233,6 @@ def roc(
 
     # Graph the ROC curve for each sample
     for sample in samples:
-
         # Sort values
         sorted = proteins.sort_values(sample, ascending=False)
 
@@ -246,7 +248,7 @@ def roc(
 
         # Graph ROC curve
         ax = axs[i]
-        p = sns.lineplot(x=fpr, y=tpr, drawstyle="steps-pre", ci=None, ax=ax)
+        p = sns.lineplot(x=fpr, y=tpr, drawstyle="steps-post", ci=None, ax=ax)
         sns.lineplot(
             x=(0, 1), y=(0, 1), color="black", linestyle="dashed", ax=ax
         )
@@ -256,8 +258,8 @@ def roc(
 
         # Calculate AUC and put on graph in lower right corner
         U, _ = stats.mannwhitneyu(
-            proteins.loc[proteins["in_term"], sample],
-            proteins.loc[~proteins["in_term"], sample],
+            sorted.loc[sorted["in_term"], sample],
+            sorted.loc[~sorted["in_term"], sample],
         )
         auc = U / (n_pos * n_neg)
         auc = "AUC = " + str(round(auc, 3))

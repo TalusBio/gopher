@@ -1,12 +1,23 @@
 """Numba Mann-Whitney U test"""
+import numba as nb
 import numpy as np
 from scipy import stats
-import numba as nb
 
 
 @nb.njit(parallel=True)
-def tiecorrect(rankvals):
-    """Parallelized version of scipy.stats.tiecorrect"""
+def tiecorrect(rankvals: np.ndarray) -> np.ndarray:
+    """Numba version of scipy.stats.tiecorrect
+
+    Parameters
+    ----------
+    rankvals : np.ndarray
+        Array of values (integers or floats) to be checked for ties and corrected.
+
+    Returns
+    -------
+    np.ndarray
+        Array of tie-corrected values.
+    """
     tc = np.ones(rankvals.shape[1], dtype=np.float64)
     for j in nb.prange(rankvals.shape[1]):
         arr = np.sort(np.ravel(rankvals[:, j]))
@@ -24,8 +35,19 @@ def tiecorrect(rankvals):
 
 
 @nb.njit(parallel=True)
-def rankdata(data):
-    """Parallelized version of scipy.stats.rankdata"""
+def rankdata(data: np.ndarray) -> np.ndarray:
+    """Numba version of scipy.stats.rankdata
+
+    Parameters
+    ----------
+    data : np.ndarray
+        Array of values (integers or floats) to be ranked.
+
+    Returns
+    -------
+    np.ndarray
+        Array of ranked values.
+    """
     ranked = np.empty(data.shape, dtype=np.float64)
     for j in nb.prange(data.shape[1]):
         arr = np.ravel(data[:, j])
@@ -44,9 +66,29 @@ def rankdata(data):
     return ranked
 
 
-def mannwhitneyu(x, y, alternative="two-sided", use_continuity=True):
-    """Version of Mann-Whitney U-test that runs in parallel on 2d arrays.
-    This is the asymptotic algo only."""
+def mannwhitneyu(
+    x: np.ndarray, y: np.ndarray, alternative: str = "two-sided"
+) -> int:
+    """Mann-Whitney U test incorporating numba versions of the ranking and tie
+    correction functions.
+
+    Parameters
+    ----------
+    x : np.ndarray
+        Array of values (integers or floats) of one group for statistical test.
+    y : np.ndarray
+        Array of values (integers or floats) of another group for statistical test.
+    alternative: str {"greater", "less", "two-sided"}
+        Type of test that should be run.
+
+    Returns
+    -------
+    Integer
+        U-statistic from Mann-Whitney U test
+    Integer
+        p-value from Mann-Whitney U test
+    """
+
     x = np.asarray(x)
     y = np.asarray(y)
     assert x.shape[1] == y.shape[1]
@@ -70,7 +112,7 @@ def mannwhitneyu(x, y, alternative="two-sided", use_continuity=True):
 
     # get mean and standard deviation
     sd = np.sqrt(T * n1 * n2 * (n1 + n2 + 1) / 12.0)
-    meanrank = n1 * n2 / 2.0 + 0.5 * use_continuity
+    meanrank = n1 * n2 / 2.0 + 0.5
 
     # do a one-sided or two-sided test depending on user specification
     if alternative == "greater":

@@ -1,9 +1,11 @@
 """Get GO annotations."""
-import requests
-import pandas as pd
-
-from . import utils, config, ontologies
 import uuid
+from pathlib import Path
+
+import pandas as pd
+import requests
+
+from . import config, ontologies, utils
 
 SPECIES = {
     "yeast": "sgd",
@@ -13,7 +15,9 @@ SPECIES = {
 }
 
 
-def generate_annotations(proteins, aspect, go_name, go_id=None):
+def generate_annotations(
+    proteins: list, aspect: str, go_name: str, go_id: str = None
+) -> pd.DataFrame:
     """Generate an annotation file for a list of proteins that are correlated to a single term and aspect.
 
     The term can be in the GO database or a new term.
@@ -48,7 +52,9 @@ def generate_annotations(proteins, aspect, go_name, go_id=None):
     return annot
 
 
-def download_annotations(stem, release="current", fetch=False):
+def download_annotations(
+    stem: str, release: str = "current", fetch: bool = False
+) -> Path:
     """Download the annotation file.
 
     See http://current.geneontology.org/annotations/index.html for details.
@@ -86,7 +92,12 @@ def download_annotations(stem, release="current", fetch=False):
     return out_file
 
 
-def load_annotations(species, aspect="all", release="current", fetch=False):
+def load_annotations(
+    species: str,
+    aspect: str = "all",
+    release: str = "current",
+    fetch: bool = False,
+):
     """Load the Gene Ontology (GO) annotations for a species.
 
     Parameters
@@ -107,7 +118,9 @@ def load_annotations(species, aspect="all", release="current", fetch=False):
 
     Returns
     -------
-    dict of str: list of str -- actually a dictionary
+    pd.DataFrame
+        The annotation dataframe.
+    dict
         A mapping of GO terms (keys) to Uniprot accessions with that
         annotation.
     """

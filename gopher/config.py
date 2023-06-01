@@ -1,6 +1,6 @@
 """This module contains the configuration details for ppx"""
-import os
 import logging
+import os
 from pathlib import Path
 
 LOGGER = logging.getLogger(__name__)
@@ -54,7 +54,7 @@ def get_data_dir():
     return config.path
 
 
-def set_data_dir(path=None):
+def set_data_dir(path: str = None):
     """Set the ppx data directory.
 
     Parameters
