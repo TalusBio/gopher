@@ -2,6 +2,20 @@
 requires = ["setuptools>=42", "wheel", "setuptools_scm[toml]>=3.4"]
 build-backend = "setuptools.build_meta"
 
+[project]
+name = "gopher"
+authors = [{name = "Carolyn Allen", email = "callen@talus.bio"}]
+description = "Fast GO Enrichment for Quantitative Proteomic Data"
+license = {text = "Apache 2.0"}
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+]
+requires-python = ">=3.6"
+
+dynamic = ["version"]
 
 [project.readme]
 file = "README.md"
