@@ -16,7 +16,7 @@ Q9Y6Y0 | 1.18023552E+09 | 1.24697638E+09 | 8.1498893E+08
 import gopher
 
 # Perform the GO enrichment analysis:
-results = gopher.test_enrichment(proteins="quant_proteins.txt")
+results = gopher.test_enrichment(proteins=quant_proteins)
 ```
 
 Gopher returns a dataframe with the following columns:
@@ -41,7 +41,7 @@ We have three aspects we can search, cellular component (cc), molecular function
 
 ```python
 # Perform the GO enrichment analysis searching on the cellular component aspect:
-results = gopher.test_enrichment(proteins="quant_proteins.txt", aspect="cc")
+results = gopher.test_enrichment(proteins=quant_proteins, aspect="cc")
 ```
 
 ***Or on a subset of terms:***
@@ -56,7 +56,7 @@ terms = [
 ]
 
 # Peform the GO enrichment analysis:
-results = gopher.test_enrichment(proteins="quant_proteins.txt", go_subset=terms)
+results = gopher.test_enrichment(proteins=quant_proteins, go_subset=terms)
 ```
 
 If you search a subset of terms, the DAG algorithm will run to aggregate all child terms of the terms of interest.
@@ -65,25 +65,25 @@ The DAG algorithm is a hybrid depth-first search and breadth-first search. The a
 
 ![An overview of gopher's DAG algorithm](static/gopher_tree_search.png){: style="width:800px"}
 
-You can turn this off using the `aggregate_terms` parameter:
+You can turn this off using the `aggregate_terms` parameter. When you turn off the `aggregate_terms` parameter, gopher only searches for proteins directly associated with the term of interest.
 
 ```python
-results = gopher.test_enrichment(proteins="quant_proteins.txt", go_subset=terms, aggregate_terms=False)
+results = gopher.test_enrichment(proteins=quant_proteins, go_subset=terms, aggregate_terms=False)
 ```
 
-***If using a file where the quant values are p-values, you can rank in ascending order:***
+***If using a file where the quant values are p-values, you can rank in ascending order.***
 
-By default, gopher ranks values by descending order, larger values will have a lower rank.
+By default, gopher ranks values by descending order, larger values will have a lower rank. The ranking order can be switched by setting the `desc` parameter to `False`.
 
 ```python
-results = gopher.test_enrichment(proteins="quant_proteins.txt", desc=False)
+results = gopher.test_enrichment(proteins=quant_proteins, desc=False)
 ```
 
 ## File parsers
 
 ***Gopher can format an encyclopeDIA and metamorpheus file for the enrichment***
 
-The output of encyclopeDIA can be directly inputed to gopher.
+The output of encyclopeDIA and metamorpheus can be directly inputed to gopher using the `read_encyclopedia` and `read_metamorpheus` functions. These functions will format the data for the enrichment.
 
 ```python
 # Read data from an EncyclopeDIA output:
@@ -95,11 +95,13 @@ results = gopher.test_enrichment(proteins=proteins)
 
 ## Normalization
 
-If raw intensities are used, you can normalize your data using the proteomic ruler approach (Wiśniewski JR, et al, 2014).
+If raw intensities are used, you can normalize your data using the proteomic ruler approach (Wiśniewski JR, et al, 2014). This approach is built off the following equations presented in the proteomic ruler paper:
+
+![Proteomic ruler equation](static/proteomic_ruler.png){: style="width:300px"}
 
 ```python
 # Normalize the raw intensities
-normalized_proteins = gopher.normalize_values("quant_proteins.txt", "human_fasta.fasta")
+normalized_proteins = gopher.normalize_values(quant_proteins, "human_fasta.fasta")
 
 # Peform the GO enrichment analysis:
 results = gopher.test_enrichment(proteins=normalized_proteins)

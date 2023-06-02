@@ -8,8 +8,8 @@ Gopher uses a Mann-Whitney U Test to look for enriched gene ontology terms that 
 
 ## Installation
 
-Gopher can be pip installed directly from GitHub:
+Gopher be pip installed using:
 
 ```python
-pip install git+https://github.com/TalusBio/gopher.git
+pip install gopher-enrich
 ```
