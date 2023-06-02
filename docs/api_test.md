@@ -1,7 +1,5 @@
-# API
-
-::: gopher.read_encyclopedia
-::: gopher.read_metamorpheus
+::: gopher.parsers.read_encyclopedia
+::: gopher.parsers.read_metamorpheus
 ::: gopher.test_enrichment
 ::: gopher.get_data_dir
 ::: gopher.set_data_dir

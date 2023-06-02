@@ -37,4 +37,19 @@ extra:
 
 plugins:
   - search
-  - mkdocs-jupyter
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          selection:
+            docstring_style: numpy
+          import:
+            - https://seaborn.pydata.org/objects.inv
+          rendering:
+            show_root_heading: true
+            heading_level: 3
+            docstring_section_style: spacy
+            show_source: false
+            merge_init_into_class: true
+  - mkdocs-jupyter:
+      # execute: true
