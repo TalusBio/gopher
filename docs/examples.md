@@ -97,7 +97,9 @@ results = gopher.test_enrichment(proteins=proteins)
 
 If raw intensities are used, you can normalize your data using the proteomic ruler approach (Wiśniewski JR, et al, 2014). This approach is built off the following equations presented in the proteomic ruler paper:
 
-![Proteomic ruler equation](static/proteomic_ruler.png){: style="width:300px"}
+\[
+    \frac{Protein \: Mass}{Total \: Protein \: Mass} \approx \frac{Protein \: MS \: Signal}{Total \: MS \: Signal}
+\]
 
 ```python
 # Normalize the raw intensities
