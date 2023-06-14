@@ -35,7 +35,7 @@ docs = [
     "mkdocs-material>=8.2.1",
     "mkdocs-jupyter>=0.20.1",
     "ipykernel>=6.12.1",
-    "python-markdown-math>=3.3.7"
+    "python-markdown-math"
 ]
 dev = [
     "pre-commit>=2.7.1",
