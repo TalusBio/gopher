@@ -24,8 +24,8 @@ def generate_annotations(
 
     Parameters
     ----------
-    proteins : list
-        List of proteins that will be annotated to a term.
+    proteins : List[str]
+        List of proteins (UniProtKB accessions) that will be annotated to a term.
     aspect: str
         String specifying the aspect the term is in ("C", "F", "P").
     go_name : str
@@ -118,7 +118,7 @@ def load_annotations(
 
     Returns
     -------
-    pd.DataFrame
+    pandas.DataFrame
         The annotation dataframe.
     dict
         A mapping of GO terms (keys) to Uniprot accessions with that

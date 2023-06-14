@@ -23,7 +23,7 @@ def map_proteins(
 
     Parameters
     ----------
-    protein_list : list
+    protein_list : List[str]
         A list of UniProt accessions.
     aspect : str, {"cc", "mf", "bp", "all"}, optional
         The Gene Ontology aspect to use. Use "cc" for "Cellular Compartment",
@@ -64,7 +64,7 @@ def get_rankings(
 
     Parameters
     ----------
-    proteins : pd.DataFrame
+    proteins : pandas.DataFrame
         Dataframe of protein quant data
     go_term : str
         String of specified GO term name
@@ -110,7 +110,7 @@ def get_annotations(
 
     Parameters
     ----------
-    proteins : pd.DataFrame
+    proteins : pandas.DataFrame
         Dataframe of proteins and quantifications
     aspect : str, {"cc", "mf", "bp", "all"}, optional
         The Gene Ontology aspect to use. Use "cc" for "Cellular Compartment",
@@ -128,6 +128,7 @@ def get_annotations(
     go_subset: list of str, optional
         The go terms of interest. Should consists of the go term names such
         as 'nucleus' or 'cytoplasm'.
+
     Returns
     -------
     pandas.DataFrame
@@ -161,11 +162,11 @@ def in_term(proteins: pd.DataFrame, go_term: str, annot: pd.DataFrame):
 
     Parameters
     ----------
-    proteins : pd.DataFrame
+    proteins : pandas.DataFrame
         Dataframe of proteins and quantifications
     go_term : str
         String of specified GO term name
-    annot : pd.DataFrame
+    annot : pandas.DataFrame
         Annotation file for the dataset
 
     Returns
@@ -193,7 +194,7 @@ def roc(
 
     Parameters
     ----------
-    proteins : pd.DataFrame
+    proteins : pandas.DataFrame
         Dataframe of proteins and quantifications
     go_term : str
         String of specified GO term name
@@ -210,9 +211,10 @@ def roc(
         most current version.
     fetch : bool, optional
         Download the GO annotations even if they have been downloaded before?
+
     Returns
     -------
-    plot
+    matplotlib.pyplot
         Plot of ROC curve for a GO term
     """
     # Get a list of the samples

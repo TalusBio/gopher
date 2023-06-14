@@ -35,6 +35,7 @@ def read_metamorpheus(proteins_txt: str) -> pd.DataFrame:
     Returns
     -------
     pandas.DataFrame
+        The Metamorpheus results in a format for gopher.
     """
     proteins = pd.read_table(proteins_txt, low_memory=False)
     accessions = proteins["Protein"].str.extract(
