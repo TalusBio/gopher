@@ -1,4 +1,5 @@
 """Test that setuptools-scm is working correctly"""
+
 import gopher
 
 

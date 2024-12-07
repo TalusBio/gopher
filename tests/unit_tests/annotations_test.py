@@ -1,4 +1,5 @@
 """Test that the annotations functions are working correctly"""
+
 import re
 
 import pandas as pd

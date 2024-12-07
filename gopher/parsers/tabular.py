@@ -1,4 +1,5 @@
 """Parse tabular result files from common tools"""
+
 import pandas as pd
 
 
@@ -53,6 +54,7 @@ def read_metamorpheus(proteins_txt: str) -> pd.DataFrame:
     )
     return proteins
 
+
 def read_diann(proteins_tsv: str) -> pd.DataFrame:
     """
     Reads a DIANN-generated TSV file containing protein information, processes it,
@@ -72,10 +74,16 @@ def read_diann(proteins_tsv: str) -> pd.DataFrame:
                       ["Protein.Group", "Protein.Ids", "Protein.Names", "Genes", "First.Protein.Description"].
     """
     proteins = pd.read_table(proteins_tsv)
-    accessions = proteins["Protein.Ids"].str.split(';').str[0]
-    
+    accessions = proteins["Protein.Ids"].str.split(";").str[0]
+
     proteins = proteins.set_index(accessions)
     proteins = proteins.rename_axis("Protein", axis="index")
     return proteins.drop(
-        columns = ["Protein.Group", "Protein.Ids", "Protein.Names", "Genes", "First.Protein.Description"]
+        columns=[
+            "Protein.Group",
+            "Protein.Ids",
+            "Protein.Names",
+            "Genes",
+            "First.Protein.Description",
+        ]
     )
