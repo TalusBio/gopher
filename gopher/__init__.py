@@ -26,4 +26,4 @@ from .display_data import (
 )
 from .enrichment import test_enrichment
 from .normalize import normalize_values
-from .parsers import read_encyclopedia, read_metamorpheus
+from .parsers import read_encyclopedia, read_metamorpheus, read_diann
