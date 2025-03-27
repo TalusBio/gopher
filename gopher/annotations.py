@@ -1,4 +1,5 @@
 """Get GO annotations."""
+
 import uuid
 from pathlib import Path
 
