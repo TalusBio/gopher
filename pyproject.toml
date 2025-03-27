@@ -27,8 +27,11 @@ dependencies = [
   "seaborn",
   "matplotlib",
 ]
-
 dynamic = ["version"]
+
+[project.scripts]
+gopher = "gopher.gopher:main"
+
 
 [project.readme]
 file = "README.md"
@@ -55,6 +58,8 @@ dev = [
     "black>=19.10b0",
     "pytest",
 ]
+
+
 
 [tool.setuptools]
 include-package-data = false
