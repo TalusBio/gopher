@@ -1,4 +1,5 @@
 """Test that the enrichment functions are working correctly"""
+
 import random
 
 import numpy as np

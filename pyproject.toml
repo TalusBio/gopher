@@ -13,9 +13,26 @@ classifiers = [
     "Operating System :: OS Independent",
     "Topic :: Scientific/Engineering :: Bio-Informatics",
 ]
-requires-python = ">=3.6"
-
+requires-python = ">=3.10"
+dependencies = [
+  "numpy > 2.0, < 3.0",
+  "pandas > 2.0, < 3.0",
+  "scipy",
+  "tqdm",
+  "statsmodels",
+  "biopython", # ... we can implement a fasta parser ...
+  "loguru",
+  "numba",
+  "requests",
+  "seaborn",
+  "matplotlib",
+  "cloudpathlib",
+]
 dynamic = ["version"]
+
+[project.scripts]
+gopher = "gopher.gopher:main"
+
 
 [project.readme]
 file = "README.md"
@@ -40,6 +57,11 @@ docs = [
 dev = [
     "pre-commit>=2.7.1",
     "black>=19.10b0",
+    "pytest",
+]
+s3 = [
+  "cloudpathlib[s3]",
+  "boto3",
 ]
 
 [tool.setuptools]
@@ -52,7 +74,7 @@ find = {namespaces = false}
 
 [tool.black]
 line-length = 79
-target-version = ['py37']
+target-version = ['py310']
 include = '\.pyi?$'
 exclude = '''
 

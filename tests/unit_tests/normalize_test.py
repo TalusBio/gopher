@@ -6,12 +6,14 @@ import pytest
 
 from gopher import normalize
 
+CURRPATH = Path(__file__).parent
+
 
 @pytest.fixture
 def real_data(tmp_path):
     """Test using small files."""
-    fasta_df = Path("../data/small-yeast.fasta")
-    quant = pd.read_csv("../data/yeast_small.csv")
+    fasta_df = CURRPATH / "../data/small-yeast.fasta"
+    quant = pd.read_csv(CURRPATH / "../data/yeast_small.csv")
     quant = quant.set_index("Protein")
 
     return quant, fasta_df

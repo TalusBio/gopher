@@ -1,4 +1,5 @@
 """Download the GO ontologies"""
+
 from collections import defaultdict
 
 from . import config, utils

@@ -1,4 +1,5 @@
 """Utility functions"""
+
 import socket
 from pathlib import Path
 

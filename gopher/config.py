@@ -1,4 +1,5 @@
 """This module contains the configuration details for ppx"""
+
 import logging
 import os
 from pathlib import Path
