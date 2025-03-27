@@ -26,6 +26,7 @@ dependencies = [
   "requests",
   "seaborn",
   "matplotlib",
+  "cloudpathlib",
 ]
 dynamic = ["version"]
 
@@ -58,8 +59,10 @@ dev = [
     "black>=19.10b0",
     "pytest",
 ]
-
-
+s3 = [
+  "cloudpathlib[s3]",
+  "boto3",
+]
 
 [tool.setuptools]
 include-package-data = false

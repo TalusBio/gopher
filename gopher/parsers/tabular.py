@@ -4,6 +4,7 @@ import os
 import io
 import pandas as pd
 import numpy as np
+from cloudpathlib import AnyPath
 
 
 def read_encyclopedia(proteins_txt: str) -> pd.DataFrame:
@@ -59,12 +60,8 @@ def read_metamorpheus(proteins_txt: str) -> pd.DataFrame:
 
 
 def _read_colnames(file: os.PathLike | io.TextIOBase) -> list[str]:
-    if isinstance(file, io.TextIOBase):
-        firstcol = file.readline()
-        file.seek(0)
-    else:
-        with open(file) as f:
-            firstcol = f.readline()
+    with open(AnyPath(file)) as f:
+        firstcol = f.readline()
 
     return firstcol.strip().split("\t")
 
@@ -117,7 +114,9 @@ def read_diann(proteins_tsv: os.PathLike) -> pd.DataFrame:
     schema: dict[str, type] = {k: float for k in columns if k not in expect}
     schema["Protein.Ids"] = str
 
-    proteins = pd.read_table(proteins_tsv, dtype=schema, usecols=list(schema))
+    proteins = pd.read_table(
+        AnyPath(proteins_tsv), dtype=schema, usecols=list(schema)
+    )
     proteins["Protein.Ids"] = proteins["Protein.Ids"].str.split(";").str[0]
 
     proteins = proteins.set_index("Protein.Ids", drop=True)
