@@ -1,4 +1,5 @@
 """The command line entry point for gopher-enrich"""
+
 import logging
 from argparse import ArgumentParser
 

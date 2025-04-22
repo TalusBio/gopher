@@ -1,4 +1,5 @@
 """Calculate the enrichments for a collection of experiments."""
+
 import logging
 
 import numpy as np

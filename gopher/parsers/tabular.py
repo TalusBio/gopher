@@ -1,6 +1,10 @@
 """Parse tabular result files from common tools"""
+
+import os
+import io
 import pandas as pd
 import numpy as np
+from cloudpathlib import AnyPath
 
 
 def read_encyclopedia(proteins_txt: str) -> pd.DataFrame:
@@ -54,10 +58,19 @@ def read_metamorpheus(proteins_txt: str) -> pd.DataFrame:
     )
     return proteins
 
-def read_diann(proteins_tsv: str) -> pd.DataFrame:
+
+def _read_colnames(file: os.PathLike | io.TextIOBase) -> list[str]:
+    with open(AnyPath(file)) as f:
+        firstcol = f.readline()
+
+    return firstcol.strip().split("\t")
+
+
+def read_diann(proteins_tsv: os.PathLike) -> pd.DataFrame:
     """
-    Reads a DIANN-generated TSV file containing protein information, processes
-    it, and returns a cleaned Pandas DataFrame with relevant data.
+    Reads a DIANN-generated TSV file (pg_matrix) containing protein information.
+
+    Also processes it, and returns a cleaned Pandas DataFrame with relevant data.
 
     The function:
     - Extracts the first protein accession from the "Protein.Ids" column to use
@@ -73,40 +86,40 @@ def read_diann(proteins_tsv: str) -> pd.DataFrame:
                 'Protein.Names',
                 'Genes',
                 'First.Protein.Description',
-                <several MSR columns>
+                <several Intensity columns>
 
 
     Returns:
         pd.DataFrame: A DataFrame with the processed protein data, indexed by
             the first protein accession.
-            The returned DataFrame has the "Protein.Ids" column as the 
-            index and all columns are the MSR columns.          
+            The returned DataFrame has the "Protein.Ids" column as the
+            index and all columns are the MSR columns.
     """
-    proteins = pd.read_table(proteins_tsv)
-    accessions = proteins["Protein.Ids"].str.split(";").str[0]
 
-    proteins = proteins.set_index(accessions)
-    proteins = proteins.rename_axis("Protein", axis="index")
-    proteins = proteins.drop(
-        columns=[
-            "Protein.Group",
-            "Protein.Ids",
-            "Protein.Names",
-            "Genes",
-            "First.Protein.Description",
-        ]
+    columns = _read_colnames(proteins_tsv)
+
+    expect = [
+        "Protein.Group",
+        "Protein.Ids",
+        "Protein.Names",
+        "Genes",
+        "First.Protein.Description",
+    ]
+
+    if not all(c in columns for c in expect):
+        msg = f"Expected columns {expect}, got {columns}, make sure you are"
+        msg += " using the 'diann_report.pg_matrix.tsv' output."
+        raise ValueError(msg)
+
+    schema: dict[str, type] = {k: float for k in columns if k not in expect}
+    schema["Protein.Ids"] = str
+
+    proteins = pd.read_table(
+        AnyPath(proteins_tsv), dtype=schema, usecols=list(schema)
     )
+    proteins["Protein.Ids"] = proteins["Protein.Ids"].str.split(";").str[0]
 
-    # Check data types
-    # (if loading from S3, default types are 'O'
-    if proteins.index.dtype not in ["O", "category", "str"]:
-        raise ValueError(
-            f"Protein index is incorrect type: {proteins.index.dtype}"
-        )
-    if not all(
-        np.issubdtype(dtype, np.floating) or dtype == "O"
-        for dtype in proteins.dtypes
-    ):
-        raise ValueError("Non-numeric columns present")
-    
+    proteins = proteins.set_index("Protein.Ids", drop=True)
+    proteins = proteins.rename_axis("Protein", axis="index")
+
     return proteins
