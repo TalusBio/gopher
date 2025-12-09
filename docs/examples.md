@@ -26,7 +26,7 @@ Gopher returns a dataframe with the following columns:
 - GO Aspect: String with the gene ontology aspect. Either C (cellular component), F (molecular function), and B (biological process).
 - Columns containing p-values from the GO enrichment.
 
-Example output: 
+Example output:
 
 GO ID | GO Name | GO Aspect | Sample 1 | Sample 2 | Sample 3
 ---------- | ----------- | ---------- | ---------- | ---------- | ----------

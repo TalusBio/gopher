@@ -3,26 +3,26 @@ name: Push docs
 on:
   push:
     branches:
-      - main
-      - documentation
+    - main
+    - documentation
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: 3.x
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v5
+      with:
+        python-version: 3.x
 
-      - name: Install font
-        run: |
-          cd /usr/share/fonts
-          wget https://github.com/JulietaUla/Montserrat/archive/refs/tags/v7.222.tar.gz
-          tar -xvzf v7.222.tar.gz
-          sudo chmod -R --reference=/usr/share/fonts/truetype Montserrat-7.222
-          sudo fc-cache -fv
-          fc-match Montserrat
+    - name: Install font
+      run: |
+        cd /usr/share/fonts
+        wget https://github.com/JulietaUla/Montserrat/archive/refs/tags/v7.222.tar.gz
+        tar -xvzf v7.222.tar.gz
+        sudo chmod -R --reference=/usr/share/fonts/truetype Montserrat-7.222
+        sudo fc-cache -fv
+        fc-match Montserrat
 
-      - run: pip install ".[docs]"
-      - run: mkdocs gh-deploy --force
+    - run: pip install ".[docs]"
+    - run: mkdocs gh-deploy --force
