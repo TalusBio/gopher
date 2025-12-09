@@ -10,10 +10,16 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-python@v5
+    - name: Checkout project
+      uses: actions/checkout@v4
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5
+
+    - name: Setup Python
+      uses: actions/setup-python@v5
       with:
-        python-version: 3.x
+        python-version-file: pyproject.toml
 
     - name: Install font
       run: |
@@ -24,5 +30,5 @@ jobs:
         sudo fc-cache -fv
         fc-match Montserrat
 
-    - run: pip install ".[docs]"
-    - run: mkdocs gh-deploy --force
+    - run: |
+        uv run mkdocs gh-deploy --force
