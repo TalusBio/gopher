@@ -1,8 +1,11 @@
 """Test that the annotations functions are working correctly"""
-from gopher import annotations
-import pytest
+
 import re
+
 import pandas as pd
+import pytest
+
+from gopher import annotations
 
 
 def test_different_species():

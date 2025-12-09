@@ -1,11 +1,12 @@
 """Utility functions"""
+
 import socket
 from pathlib import Path
 
 import requests
 
 
-def http_download(url, path):
+def http_download(url: str, path: Path):
     """Download a file using GET.
 
     Parameters

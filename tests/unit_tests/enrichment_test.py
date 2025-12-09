@@ -1,11 +1,13 @@
 """Test that the enrichment functions are working correctly"""
-from gopher import enrichment
-from gopher import annotations
-import gopher
-import pandas as pd
+
 import random
-from scipy import stats
+
 import numpy as np
+import pandas as pd
+from scipy import stats
+
+import gopher
+from gopher import annotations, enrichment
 
 
 def test_entire_enrichment_analysis(generate_proteins):

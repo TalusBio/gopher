@@ -1,6 +1,8 @@
 """Download the GO ontologies"""
-from . import utils, config
+
 from collections import defaultdict
+
+from . import config, utils
 
 
 def download_ontology():

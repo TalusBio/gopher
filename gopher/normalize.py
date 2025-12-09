@@ -1,8 +1,11 @@
+from pathlib import Path
+
 import pandas as pd
 from Bio import SeqIO, SeqUtils
+from loguru import logger
 
 
-def normalize(proteins, fasta):
+def normalize_values(proteins: pd.DataFrame, fasta: Path):
     """Normalize intensity values.
 
     Normalize using the proteomic ruler approach outlined by Wiśniewski et al.
@@ -22,10 +25,9 @@ def normalize(proteins, fasta):
         The normalized intensities for every protein in each sample.
     """
     fasta_df = read_fasta(fasta)
-
+    fasta_df = fasta_df.set_index("Protein")
     proteins = proteins.apply(col_norm, axis=0)
-    df = pd.merge(fasta_df, proteins, on="Protein")
-    df = df.set_index("Protein")
+    df = proteins.join(fasta_df)
     df = df.drop(columns=["Sequence"])
     df = df.apply(mass_norm, axis=1)
     df = df.drop(columns=["Mass"])
@@ -33,11 +35,26 @@ def normalize(proteins, fasta):
     return df
 
 
-def read_fasta(fasta):
+def read_fasta(fasta: Path):
+    """Read a fasta file into a dataframe with relevant columns
+
+    Parameters
+    ----------
+    fasta : Path
+        Use the FASTA file to read and generate molecular weights
+
+    Returns
+    -------
+    pandas.DataFrame
+        The fasta dataframe with relevant columns.
+    """
     fasta_df = []
     for entry in SeqIO.parse(open(fasta), "fasta"):
         name = entry.id.split("|")[1]
-        mass = SeqUtils.molecular_weight(entry.seq, seq_type="protein")
+        try:
+            mass = SeqUtils.molecular_weight(entry.seq, seq_type="protein")
+        except:
+            logger.warning("Ambiguous peptide in {}".format(name))
         temp = pd.DataFrame(
             {"Protein": name, "Sequence": str(entry.seq), "Mass": mass},
             index=[0],

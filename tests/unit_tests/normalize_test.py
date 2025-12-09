@@ -1,15 +1,19 @@
-import pytest
 from pathlib import Path
-import pandas as pd
-from gopher import normalize
+
 import numpy as np
+import pandas as pd
+import pytest
+
+from gopher import normalize
+
+CURRPATH = Path(__file__).parent
 
 
 @pytest.fixture
 def real_data(tmp_path):
     """Test using small files."""
-    fasta_df = Path("../data/small-yeast.fasta")
-    quant = pd.read_csv("../data/yeast_small.csv")
+    fasta_df = CURRPATH / "../data/small-yeast.fasta"
+    quant = pd.read_csv(CURRPATH / "../data/yeast_small.csv")
     quant = quant.set_index("Protein")
 
     return quant, fasta_df
@@ -18,7 +22,7 @@ def real_data(tmp_path):
 def test_normalize(real_data):
     """Check that the normalization returns a dataframe."""
     quant, fasta = real_data
-    df = normalize.normalize(quant, fasta)
+    df = normalize.normalize_values(quant, fasta)
     assert isinstance(df, pd.DataFrame)
 
 
@@ -36,5 +40,5 @@ def test_normalize_one_prot(real_data):
     ].iloc[0]
     manual_result = vals / vals / mass
     # Get the calculation from the function and compare the results
-    result = normalize.normalize(single_prot_quant, fasta).values
+    result = normalize.normalize_values(single_prot_quant, fasta).values
     np.testing.assert_array_equal(result, manual_result)
