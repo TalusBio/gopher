@@ -1,22 +1,21 @@
 from pathlib import Path
+
 import pandas as pd
 import pytest
-from pandas.testing import assert_frame_equal
-
 from cloudpathlib import CloudPath, implementation_registry
 from cloudpathlib.local import (
     LocalS3Client,
     LocalS3Path,
     local_s3_implementation,
 )
+from pandas.testing import assert_frame_equal
+
 from gopher.parsers.tabular import read_diann
 
 
 @pytest.fixture
 def cloud_asset_file(monkeypatch):
-    """Fixture that patches CloudPath dispatch and also sets up test assets in LocalS3Client's
-    local storage directory."""
-
+    """Patch CloudPath dispatch and seed LocalS3Client test assets."""
     monkeypatch.setitem(implementation_registry, "s3", local_s3_implementation)
 
     # Option 1: Use LocalS3Path to set up test assets directly
@@ -25,7 +24,8 @@ def cloud_asset_file(monkeypatch):
     )
     # Simulated DIANN output
     mock_data = (
-        "Protein.Group\tProtein.Ids\tProtein.Names\tGenes\tFirst.Protein.Description\tIntensity.Sample1\tIntensity.Sample2",
+        "Protein.Group\tProtein.Ids\tProtein.Names\tGenes\t"
+        "First.Protein.Description\tIntensity.Sample1\tIntensity.Sample2",
         "PG1\tP12345;P67890\tProtein A\tGENE1\tDescription A\t1000\t2000",
         "PG2\tP23456\tProtein B\tGENE2\tDescription B\t1500\t2500",
     )
@@ -36,7 +36,8 @@ def cloud_asset_file(monkeypatch):
     )
     # Simulated DIANN output
     mock_data = (
-        "Genes\tFirst.Protein.Description\tIntensity.Sample1\tIntensity.Sample2",
+        "Genes\tFirst.Protein.Description\tIntensity.Sample1\t"
+        "Intensity.Sample2",
         "GENE1\tDescription A\t1000\t2000",
         "GENE2\tDescription B\t1500\t2500",
     )
@@ -60,10 +61,12 @@ def cloud_asset_file(monkeypatch):
 
     yield {"cloud_path": cloud_path_1, "expected": expected}
 
-    LocalS3Client.reset_default_storage_dir()  # clean up temp directory and replace with new one
+    # Clean up temp directory and replace with new one.
+    LocalS3Client.reset_default_storage_dir()
 
 
 def test_read_diann_removes_metadata_and_sets_index_cloud(cloud_asset_file):
+    """Read DIANN from cloud path and set protein index."""
     result = read_diann(
         "s3://cloudpathlib-test-bucket/diann_report.pg_mat.tsv"
     )
@@ -73,6 +76,7 @@ def test_read_diann_removes_metadata_and_sets_index_cloud(cloud_asset_file):
 def test_read_diann_removes_metadata_and_sets_index_local(
     cloud_asset_file, tmpdir
 ):
+    """Read DIANN from local path and set protein index."""
     local_path = Path(tmpdir) / "diann_report.pg_mat.tsv"
     with open(local_path, "w") as f:
         f.write(cloud_asset_file["cloud_path"].read_text())
@@ -82,10 +86,8 @@ def test_read_diann_removes_metadata_and_sets_index_local(
 
 
 def test_read_diann_faile_with_gg(cloud_asset_file):
-
+    """Fail when DIANN input lacks protein group columns."""
     with pytest.raises(ValueError) as e:
-        result = read_diann(
-            "s3://cloudpathlib-test-bucket/diann_report.gg_mat.tsv"
-        )
+        read_diann("s3://cloudpathlib-test-bucket/diann_report.gg_mat.tsv")
 
     assert "Expected columns" in str(e.value.args[0])

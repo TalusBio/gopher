@@ -1,4 +1,4 @@
-"""This module contains the configuration details for ppx"""
+"""Configuration helpers for ppx data directories."""
 
 import logging
 import os
@@ -8,15 +8,16 @@ LOGGER = logging.getLogger(__name__)
 
 
 class GopherConfig:
-    """Configure the data directory for ppx
+    """Configure the data directory for ppx.
 
     Attributes
     ----------
     path : pathlib.Path object
+
     """
 
     def __init__(self):
-        """Initialize the _PPXDataDir"""
+        """Initialize the _PPXDataDir."""
         self._path = None
         self.path = os.getenv("GOPHER_DATA_DIR")
 
@@ -27,7 +28,7 @@ class GopherConfig:
 
     @path.setter
     def path(self, path):
-        """Set the current ppx data directory"""
+        """Set the current ppx data directory."""
         if path is None:
             try:
                 path = (
@@ -39,7 +40,7 @@ class GopherConfig:
                         "exist."
                     )
             except KeyError:
-                path = Path(Path.home(), ".gopher")
+                path = Path(Path.cwd(), ".gopher_data").resolve()
         else:
             path = Path(path).expanduser().resolve()
             if not path.exists():
@@ -55,13 +56,14 @@ def get_data_dir():
     return config.path
 
 
-def set_data_dir(path: str = None):
+def set_data_dir(path=None):
     """Set the ppx data directory.
 
     Parameters
     ----------
     path : str or pathlib.Path object, optional
         The path for ppx to use as its data directory.
+
     """
     config.path = path
 

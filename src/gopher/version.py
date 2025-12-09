@@ -1,4 +1,4 @@
-"""Get the package version"""
+"""Get the package version."""
 
 
 def _get_version():
@@ -12,6 +12,7 @@ def _get_version():
     -------
     str or None
         The package version number. If not version is found, returns None.
+
     """
     try:
         # Fast, but only works in Python 3.8+

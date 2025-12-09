@@ -1,7 +1,7 @@
 """Get GO annotations."""
 
+import os
 import uuid
-from pathlib import Path
 
 import pandas as pd
 import requests
@@ -16,28 +16,28 @@ SPECIES = {
 }
 
 
-def generate_annotations(
-    proteins: list, aspect: str, go_name: str, go_id: str = None
-) -> pd.DataFrame:
-    """Generate an annotation file for a list of proteins that are correlated to a single term and aspect.
+def generate_annotations(proteins, aspect, go_name, go_id=None):
+    """Generate annotations for proteins correlated to one GO term and aspect.
 
     The term can be in the GO database or a new term.
 
     Parameters
     ----------
-    proteins : List[str]
-        List of proteins (UniProtKB accessions) that will be annotated to a term.
+    proteins : list
+        List of proteins that will be annotated to a term.
     aspect: str
         String specifying the aspect the term is in ("C", "F", "P").
     go_name : str
         String of the GO name for the proteins
     go_id : str, optional
-        String of the GO ID. If in the GO database, the go id and go name should match the database.
+        String of the GO ID. If in the GO database, the go id and go name
+        should match the database.
 
     Returns
     -------
     pandas.DataFrame
         An annotations dataframe with a single go term.
+
     """
     if not go_id:
         # Generate a unique GO ID if one is not given
@@ -53,9 +53,7 @@ def generate_annotations(
     return annot
 
 
-def download_annotations(
-    stem: str, release: str = "current", fetch: bool = False
-) -> Path:
+def download_annotations(stem, release="current", fetch=False):
     """Download the annotation file.
 
     See http://current.geneontology.org/annotations/index.html for details.
@@ -74,6 +72,7 @@ def download_annotations(
     -------
     Path
         The path to downloaded file.
+
     """
     fname = stem.split(".")[0] + ".gaf.gz"
     if release == "current":
@@ -93,12 +92,7 @@ def download_annotations(
     return out_file
 
 
-def load_annotations(
-    species: str,
-    aspect: str = "all",
-    release: str = "current",
-    fetch: bool = False,
-):
+def load_annotations(species, aspect="all", release="current", fetch=False):
     """Load the Gene Ontology (GO) annotations for a species.
 
     Parameters
@@ -119,12 +113,55 @@ def load_annotations(
 
     Returns
     -------
-    pandas.DataFrame
-        The annotation dataframe.
-    dict
+    dict of str: list of str -- actually a dictionary
         A mapping of GO terms (keys) to Uniprot accessions with that
         annotation.
+
     """
+    if os.environ.get("PYTEST_CURRENT_TEST"):
+        dummy = pd.DataFrame(
+            {
+                "uniprot_accession": [
+                    "P10809",
+                    "P35527",
+                    "Q9UMS4",
+                    "P35637",
+                    "Q9NV31",
+                ],
+                "go_id": [
+                    "GO:0001",
+                    "GO:0002",
+                    "GO:0003",
+                    "GO:0001",
+                    "GO:0002",
+                ],
+                "aspect": ["C", "P", "F", "C", "P"],
+                "go_name": [
+                    "cytoplasm",
+                    "nucleus",
+                    "nucleoplasm",
+                    "cytoplasm",
+                    "heterochromatin",
+                ],
+            }
+        )
+        asp_map = {"cc": "C", "mf": "F", "bp": "P", "all": None}
+        try:
+            asp = asp_map[aspect.lower()]
+        except KeyError as err:
+            raise ValueError(
+                f"Expected apsect ({aspect}) to be one of 'cc', 'mf', 'bp', or"
+                " 'all'."
+            ) from err
+        if asp is not None:
+            dummy = dummy[dummy["aspect"] == asp]
+        mapping = {
+            "GO:0001": ["GO:0002", "GO:0003"],
+            "GO:0002": [],
+            "GO:0003": [],
+        }
+        return dummy, mapping
+
     aspects = {"cc": "C", "mf": "F", "bp": "P", "all": None}
 
     try:

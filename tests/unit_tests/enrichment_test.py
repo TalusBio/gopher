@@ -1,4 +1,4 @@
-"""Test that the enrichment functions are working correctly"""
+"""Test that the enrichment functions are working correctly."""
 
 import random
 
@@ -12,7 +12,9 @@ from gopher import annotations, enrichment
 
 def test_entire_enrichment_analysis(generate_proteins):
     """Check that the test enrichment function returns a dataframe.
-    This test will run the full GO enrichment on a dataset."""
+
+    This test runs the full GO enrichment on a dataset.
+    """
     df = generate_proteins
     df.set_index("Protein", inplace=True)
     result = enrichment.test_enrichment(df)
@@ -21,7 +23,9 @@ def test_entire_enrichment_analysis(generate_proteins):
 
 def test_subset_enrichment_analysis(generate_proteins):
     """Check that the test enrichment function returns a dataframe.
-    This test will run the GO enrichment on a subset of terms."""
+
+    This test runs the GO enrichment on a subset of terms.
+    """
     df = generate_proteins
     df.set_index("Protein", inplace=True)
     terms = [
@@ -39,7 +43,7 @@ def test_subset_enrichment_analysis(generate_proteins):
 
 
 def test_custom_annotations(generate_proteins):
-    """Test that a custom annotations file gives a different output than the default and contains the new GO term,"""
+    """Test custom annotations change results and include new terms."""
     prot = generate_proteins
     custom = annotations.generate_annotations(
         proteins=prot["Protein"][: len(prot) // 2], aspect="C", go_name="test"
@@ -84,8 +88,7 @@ def test_custom_mapping_annotations(
 
 
 def test_mannwhitneyu_small(generate_arrays):
-    """Test the Mann-Whitney U numba function returns the same values
-    as the scipy function on a small dataset for a two-sided test"""
+    """Test Mann-Whitney U numba matches SciPy on a small two-sided test."""
     list1, list2 = generate_arrays
     res_scipy = stats.mannwhitneyu(list1, list2)
     res_numba = gopher.stats.mannwhitneyu(list1, list2)
@@ -95,8 +98,7 @@ def test_mannwhitneyu_small(generate_arrays):
 
 
 def test_mannwhitneyu_greater(generate_arrays):
-    """Test the Mann-Whitney U numba function returns the same values
-    as the scipy function on a small dataset for a one-sided, greater test"""
+    """Test Mann-Whitney U numba matches SciPy on a greater one-sided test."""
     list1, list2 = generate_arrays
     res_scipy = stats.mannwhitneyu(list1, list2, alternative="greater")
     res_numba = gopher.stats.mannwhitneyu(list1, list2, alternative="greater")
@@ -106,8 +108,7 @@ def test_mannwhitneyu_greater(generate_arrays):
 
 
 def test_mannwhitneyu_less(generate_arrays):
-    """Test the Mann-Whitney U numba function returns the same values
-    as the scipy function on a small dataset for a one-sided, lesser test"""
+    """Test Mann-Whitney U numba matches SciPy on a lesser one-sided test."""
     list1, list2 = generate_arrays
     res_scipy = stats.mannwhitneyu(list1, list2, alternative="less")
     res_numba = gopher.stats.mannwhitneyu(list1, list2, alternative="less")
@@ -117,8 +118,7 @@ def test_mannwhitneyu_less(generate_arrays):
 
 
 def test_mannwhitneyu_big():
-    """Test the Mann-Whitney U numba function returns the same values
-    as the scipy function on a larger dataset for a two-sided test"""
+    """Test Mann-Whitney U numba matches SciPy on a larger two-sided test."""
     list1 = []
     list2 = []
     random.seed(10)

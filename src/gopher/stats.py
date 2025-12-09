@@ -1,4 +1,4 @@
-"""Numba Mann-Whitney U test"""
+"""Numba Mann-Whitney U test."""
 
 import numba as nb
 import numpy as np
@@ -6,19 +6,8 @@ from scipy import stats
 
 
 @nb.njit(parallel=True)
-def tiecorrect(rankvals: np.ndarray) -> np.ndarray:
-    """Numba version of scipy.stats.tiecorrect
-
-    Parameters
-    ----------
-    rankvals : np.ndarray
-        Array of values (integers or floats) to be checked for ties and corrected.
-
-    Returns
-    -------
-    np.ndarray
-        Array of tie-corrected values.
-    """
+def tiecorrect(rankvals):
+    """Parallelized version of scipy.stats.tiecorrect."""
     tc = np.ones(rankvals.shape[1], dtype=np.float64)
     for j in nb.prange(rankvals.shape[1]):
         arr = np.sort(np.ravel(rankvals[:, j]))
@@ -36,19 +25,8 @@ def tiecorrect(rankvals: np.ndarray) -> np.ndarray:
 
 
 @nb.njit(parallel=True)
-def rankdata(data: np.ndarray) -> np.ndarray:
-    """Numba version of scipy.stats.rankdata
-
-    Parameters
-    ----------
-    data : np.ndarray
-        Array of values (integers or floats) to be ranked.
-
-    Returns
-    -------
-    np.ndarray
-        Array of ranked values.
-    """
+def rankdata(data):
+    """Parallelized version of scipy.stats.rankdata."""
     ranked = np.empty(data.shape, dtype=np.float64)
     for j in nb.prange(data.shape[1]):
         arr = np.ravel(data[:, j])
@@ -67,29 +45,11 @@ def rankdata(data: np.ndarray) -> np.ndarray:
     return ranked
 
 
-def mannwhitneyu(
-    x: np.ndarray, y: np.ndarray, alternative: str = "two-sided"
-) -> int:
-    """Mann-Whitney U test incorporating numba versions of the ranking and tie
-    correction functions.
+def mannwhitneyu(x, y, alternative="two-sided", use_continuity=True):
+    """Version of Mann-Whitney U-test that runs in parallel on 2d arrays.
 
-    Parameters
-    ----------
-    x : np.ndarray
-        Array of values (integers or floats) of one group for statistical test.
-    y : np.ndarray
-        Array of values (integers or floats) of another group for statistical test.
-    alternative: str {"greater", "less", "two-sided"}
-        Type of test that should be run.
-
-    Returns
-    -------
-    Integer
-        U-statistic from Mann-Whitney U test
-    Integer
-        p-value from Mann-Whitney U test
+    This is the asymptotic algo only.
     """
-
     x = np.asarray(x)
     y = np.asarray(y)
     assert x.shape[1] == y.shape[1]
@@ -105,30 +65,30 @@ def mannwhitneyu(
     u2 = n1 * n2 - u1  # remainder is U for y
 
     # check for ties in the rankings
-    T = tiecorrect(ranked)
+    t_correction = tiecorrect(ranked)
 
     # if *everything* is identical we'll raise an error, not otherwise
-    if np.all(T == 0):
+    if np.all(t_correction == 0):
         raise ValueError("All numbers are identical")
 
     # get mean and standard deviation
-    sd = np.sqrt(T * n1 * n2 * (n1 + n2 + 1) / 12.0)
-    meanrank = n1 * n2 / 2.0 + 0.5
+    sd = np.sqrt(t_correction * n1 * n2 * (n1 + n2 + 1) / 12.0)
+    meanrank = n1 * n2 / 2.0 + 0.5 * use_continuity
 
     # do a one-sided or two-sided test depending on user specification
     if alternative == "greater":
-        U, f = u2, 1
+        u_val, f = u2, 1
     elif alternative == "less":
-        U, f = u1, 1
+        u_val, f = u1, 1
     else:
-        U, f = np.maximum(u1, u2), 2
+        u_val, f = np.maximum(u1, u2), 2
 
     # calculate z and use it to find the p-values
     with np.errstate(divide="ignore", invalid="ignore"):
-        z = (U - meanrank) / sd
+        z = (u_val - meanrank) / sd
 
     p = stats.norm.sf(z)
     p *= f
     p = np.clip(p, 0, 1)
 
-    return U, p
+    return u_val, p

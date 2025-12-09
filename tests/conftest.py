@@ -1,16 +1,16 @@
-"""Fixtures used for testing"""
+"""Fixtures used for testing."""
 
 import random
 import string
+
 import numpy as np
 import pandas as pd
-
 import pytest
 
 
 @pytest.fixture
 def generate_proteins():
-    "Generate a random list of protein data"
+    """Generate a random list of protein data."""
     prot = [
         "P10809",
         "P35527",
@@ -51,7 +51,7 @@ def generate_proteins():
 
 @pytest.fixture
 def generate_arrays():
-    "Generate arrays with random numbers"
+    """Generate arrays with random numbers."""
     rng = np.random.default_rng(1)  # A random number generator
     list1 = rng.integers(1, 10, size=(20, 5)).tolist()
     list2 = rng.integers(5, 15, size=(20, 5)).tolist()
@@ -60,7 +60,7 @@ def generate_arrays():
 
 @pytest.fixture
 def generate_mapping():
-    "Create mock mapping"
+    """Create mock mapping."""
     mapping = {
         "a": ["b", "c", "d"],
         "b": ["e"],
@@ -76,7 +76,7 @@ def generate_mapping():
 
 @pytest.fixture
 def generate_annotations():
-    "Create annotations for mock data"
+    """Create annotations for mock data."""
     annot = {
         "uniprot_accession": list(range(0, 26)),
         "go_id": list(string.ascii_lowercase),
@@ -88,7 +88,7 @@ def generate_annotations():
 
 @pytest.fixture
 def generate_fake_proteins():
-    "Generate a random list of protein data"
+    """Generate a random list of protein data."""
     prot = list(range(0, 26))
     sample1 = []
     sample2 = []

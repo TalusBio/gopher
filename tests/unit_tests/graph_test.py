@@ -4,7 +4,7 @@ from gopher import enrichment, graph_search
 
 
 def test_graph_mapping(generate_mapping):
-    """Test the graph mapping functionality maps the terms and returns the new mapping in a dictionary."""
+    """Ensure graph mapping expands terms and returns the updated mapping."""
     mapping = generate_mapping
     go_subset = ["a", "y", "z"]
     mapped = graph_search.new_map(mapping, go_subset)
@@ -17,7 +17,7 @@ def test_graph_mapping(generate_mapping):
 
 
 def test_graph_search(generate_annotations, generate_mapping):
-    """Test the graph search algorithm gives the information that would be expected."""
+    """Ensure graph search returns expected term expansions."""
     annot = generate_annotations
     mapping = generate_mapping
     go_subset = ["y", "z"]
@@ -40,9 +40,7 @@ def test_graph_search(generate_annotations, generate_mapping):
 
 
 def test_enrichment_graph_search(generate_proteins):
-    """Check that the test enrichment function works with the incorporated graph algorithm
-    and gives you different results from the enrichment without the graph algorithm.
-    """
+    """Check enrichment works with graph algorithm and changes the results."""
     df = generate_proteins
     df.set_index("Protein", inplace=True)
     terms = [

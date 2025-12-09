@@ -2,6 +2,12 @@
 build-backend = "setuptools.build_meta"
 requires = ["setuptools>=42", "wheel", "setuptools_scm[toml]>=3.4"]
 
+[dependency-groups]
+dev = [
+  "pytest>=8.4.1",
+  "ruff>=0.12.7"
+]
+
 [project]
 authors = [
   {name = "Lilly Tatka", email = "ltatka@talus.bio"},
