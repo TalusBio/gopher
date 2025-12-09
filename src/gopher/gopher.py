@@ -1,4 +1,4 @@
-"""The command line entry point for gopher-enrich"""
+"""The command line entry point for gopher-enrich."""
 
 import logging
 from argparse import ArgumentParser
@@ -16,6 +16,7 @@ def parse_args():
     -------
     Namespace
         A namespace populated with the parsed arguments.
+
     """
     desc = """
     gopher: Gene ontology enrichment analysis using protein expression. For
@@ -27,7 +28,7 @@ def parse_args():
         "proteins",
         type=str,
         help="""
-        The quanitfied proteins in each sample. Currently, only results from
+        The quantified proteins in each sample. Currently, only results from
          EncyclopeDIA are supported.
         """,
     )
@@ -44,7 +45,7 @@ def parse_args():
         choices=["cc", "mf", "bp", "all"],
         default="all",
         help="""
-        The Gene Ontology aspect to use. Use "cc" for  "Cellular Compartment",
+        The Gene Ontology aspect to use. Use "cc" for "Cellular Compartment",
          "mf" for "Molecular Function", and "bp" for "Biological Process", or
          "all" for all three.
         """,
@@ -78,7 +79,7 @@ def parse_args():
         "--go_filters",
         type=str,
         help="""
-        The GO terms of interest, separated by commas (","). May concist of
+        The GO terms of interest, separated by commas (","). May consist of
          GO term names (ex: "nucleus,cytosol") or GO term accessions (ex:
          "GO:0005634,GO:0005829").
         """,
@@ -106,7 +107,7 @@ def parse_args():
 
 
 def main():
-    """The command line function"""
+    """The main command line function."""
     logging.basicConfig(
         level=logging.INFO, format="[%(levelname)s] %s(message)s"
     )

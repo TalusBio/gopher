@@ -1,4 +1,4 @@
-"""Test that the annotations functions are working correctly"""
+"""Test that the annotations functions are working correctly."""
 
 import re
 
@@ -9,13 +9,13 @@ from gopher import annotations
 
 
 def test_different_species():
-    """Check that the annotations can load different species"""
+    """Check that the annotations can load different species."""
     load, _ = annotations.load_annotations("mgi", "cc")
     assert isinstance(load, pd.DataFrame)
 
 
 def test_error():
-    """Check that annotations loaded function catches errors and returns correct error report"""
+    """Check that loading annotations catches errors and reports correctly."""
     annotations.load_annotations(species="human", aspect="bp")
     annotations.load_annotations(species="yeast", aspect="all")
     with pytest.raises(
@@ -28,7 +28,7 @@ def test_error():
 
 
 def test_generate_annotations():
-    """Test that the generate_annotations function returns the correct dataframe."""
+    """Test generate_annotations returns the expected dataframe."""
     prot = ["P10809", "P35527", "Q9UMS4", "P52907", "Q9NV31"]
     aspect = "mf"
     go_name = "temporary"

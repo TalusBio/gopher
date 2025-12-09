@@ -13,17 +13,17 @@ LOGGER = logging.getLogger(__name__)
 
 
 def map_proteins(
-    protein_list: list,
-    aspect: str = "all",
-    species: str = "human",
-    release: str = "current",
-    fetch: bool = False,
+    protein_list,
+    aspect="all",
+    species="human",
+    release="current",
+    fetch=False,
 ):
-    """Map the proteins to the GO terms
+    """Map the proteins to the GO terms.
 
     Parameters
     ----------
-    protein_list : List[str]
+    protein_list : list
         A list of UniProt accessions.
     aspect : str, {"cc", "mf", "bp", "all"}, optional
         The Gene Ontology aspect to use. Use "cc" for "Cellular Compartment",
@@ -42,9 +42,11 @@ def map_proteins(
     Returns
     -------
     pandas.DataFrame
-        Dataframe with protein accessions and GO terms
+        Dataframe with protein accessions and GO terms.
+
     """
-    # Put the protein list into a dataframe so it can be used to get the annotations
+    # Put the protein list into a dataframe so it can be used to get
+    # annotations.
     proteins = pd.DataFrame(index=protein_list)
     # Get the annotations
     annot = get_annotations(proteins, aspect, species, release, fetch)
@@ -53,18 +55,18 @@ def map_proteins(
 
 
 def get_rankings(
-    proteins: pd.DataFrame,
-    go_term: str,
-    aspect: str = "all",
-    species: str = "human",
-    release: str = "current",
-    fetch: bool = False,
+    proteins,
+    go_term,
+    aspect="all",
+    species="human",
+    release="current",
+    fetch=False,
 ):
-    """Rank the proteins and show whether proteins are in a specified term
+    """Rank the proteins and show whether proteins are in a specified term.
 
     Parameters
     ----------
-    proteins : pandas.DataFrame
+    proteins : pd.DataFrame
         Dataframe of protein quant data
     go_term : str
         String of specified GO term name
@@ -85,7 +87,9 @@ def get_rankings(
     Returns
     -------
     pandas.DataFrame
-        Dataframe with protein rankings and whether or not the protein is in the specified term
+        Dataframe with protein rankings and whether the protein is in the
+        specified term.
+
     """
     # Get the annotations
     annot = get_annotations(proteins, aspect, species, release, fetch)
@@ -99,19 +103,19 @@ def get_rankings(
 
 
 def get_annotations(
-    proteins: pd.DataFrame,
-    aspect: str = "all",
-    species: str = "human",
-    release: str = "current",
-    fetch: bool = False,
-    go_subset: list = None,
+    proteins,
+    aspect="all",
+    species="human",
+    release="current",
+    fetch=False,
+    go_subset=None,
 ):
-    """Gets the annotations for proteins in a dataset
+    """Get the annotations for proteins in a dataset.
 
     Parameters
     ----------
-    proteins : pandas.DataFrame
-        Dataframe of proteins and quantifications
+    proteins : pd.DataFrame
+        Dataframe of proteins and quantifications.
     aspect : str, {"cc", "mf", "bp", "all"}, optional
         The Gene Ontology aspect to use. Use "cc" for "Cellular Compartment",
         "mf" for "Molecular Function", "bp" for "Biological Process", or "all"
@@ -132,7 +136,8 @@ def get_annotations(
     Returns
     -------
     pandas.DataFrame
-        Dataframe with protein annotations
+        Dataframe with protein annotations.
+
     """
     # Load the annotation file
     annot, _ = load_annotations(
@@ -157,22 +162,23 @@ def get_annotations(
     return annot
 
 
-def in_term(proteins: pd.DataFrame, go_term: str, annot: pd.DataFrame):
-    """See if proteins are associated with a specific term
+def in_term(proteins, go_term, annot):
+    """See if proteins are associated with a specific term.
 
     Parameters
     ----------
-    proteins : pandas.DataFrame
-        Dataframe of proteins and quantifications
+    proteins : pd.DataFrame
+        Dataframe of proteins and quantifications.
     go_term : str
-        String of specified GO term name
-    annot : pandas.DataFrame
-        Annotation file for the dataset
+        String of specified GO term name.
+    annot : pd.DataFrame
+        Annotation file for the dataset.
 
     Returns
     -------
     pandas.DataFrame
-        Dataframe with protein quant and if protein is in the given term
+        Dataframe with protein quant and if protein is in the given term.
+
     """
     # Get columns of terms
     term = annot[annot["go_name"] == go_term]
@@ -183,21 +189,21 @@ def in_term(proteins: pd.DataFrame, go_term: str, annot: pd.DataFrame):
 
 
 def roc(
-    proteins: pd.DataFrame,
-    go_term: str,
-    aspect: str = "all",
-    species: str = "human",
-    release: str = "current",
-    fetch: bool = False,
+    proteins,
+    go_term,
+    aspect="all",
+    species="human",
+    release="current",
+    fetch=False,
 ):
-    """Plot the ROC curve for a go term in each sample
+    """Plot the ROC curve for a GO term in each sample.
 
     Parameters
     ----------
-    proteins : pandas.DataFrame
-        Dataframe of proteins and quantifications
+    proteins : pd.DataFrame
+        Dataframe of proteins and quantifications.
     go_term : str
-        String of specified GO term name
+        String of specified GO term name.
     aspect : str, {"cc", "mf", "bp", "all"}, optional
         The Gene Ontology aspect to use. Use "cc" for "Cellular Compartment",
         "mf" for "Molecular Function", "bp" for "Biological Process", or "all"
@@ -214,17 +220,16 @@ def roc(
 
     Returns
     -------
-    matplotlib.pyplot
-        Plot of ROC curve for a GO term
+    plot
+        Plot of ROC curve for a GO term.
+
     """
     # Get a list of the samples
     samples = proteins.columns
     # Get annotations
     annot = get_annotations(proteins, aspect, species, release, fetch)
-
     # Rank the data based on the go term
     proteins = in_term(proteins, go_term, annot)
-
     # Get the number of positive and negative cases
     n_pos = sum(proteins["in_term"])
     n_neg = len(proteins) - n_pos
@@ -250,7 +255,7 @@ def roc(
 
         # Graph ROC curve
         ax = axs[i]
-        p = sns.lineplot(x=fpr, y=tpr, drawstyle="steps-post", ci=None, ax=ax)
+        p = sns.lineplot(x=fpr, y=tpr, drawstyle="steps-pre", ci=None, ax=ax)
         sns.lineplot(
             x=(0, 1), y=(0, 1), color="black", linestyle="dashed", ax=ax
         )
@@ -259,11 +264,11 @@ def roc(
         ax.set_ylabel("True Positive Rate (TPR)")
 
         # Calculate AUC and put on graph in lower right corner
-        U, _ = stats.mannwhitneyu(
-            sorted.loc[sorted["in_term"], sample],
-            sorted.loc[~sorted["in_term"], sample],
+        u_stat, _ = stats.mannwhitneyu(
+            proteins.loc[proteins["in_term"], sample],
+            proteins.loc[~proteins["in_term"], sample],
         )
-        auc = U / (n_pos * n_neg)
+        auc = u_stat / (n_pos * n_neg)
         auc = "AUC = " + str(round(auc, 3))
         p.annotate(auc, xy=(0.75, 0))
 

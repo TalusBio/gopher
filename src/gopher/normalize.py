@@ -1,11 +1,8 @@
-from pathlib import Path
-
 import pandas as pd
 from Bio import SeqIO, SeqUtils
-from loguru import logger
 
 
-def normalize_values(proteins: pd.DataFrame, fasta: Path):
+def normalize(proteins, fasta):
     """Normalize intensity values.
 
     Normalize using the proteomic ruler approach outlined by Wiśniewski et al.
@@ -15,19 +12,22 @@ def normalize_values(proteins: pd.DataFrame, fasta: Path):
     ----------
     proteins : pandas.DataFrame
         A dataframe where the indices are UniProt accessions and each column is
-        an experiment to test. The values in this dataframe raw protein abundance
+        an experiment to test. The values in this dataframe are raw protein
+        abundance.
     fasta : Path
-        Use the FASTA file to generate molecular weights for normalization
+        Use the FASTA file to generate molecular weights for normalization.
 
     Returns
     -------
     pandas.DataFrame
         The normalized intensities for every protein in each sample.
+
     """
     fasta_df = read_fasta(fasta)
-    fasta_df = fasta_df.set_index("Protein")
+
     proteins = proteins.apply(col_norm, axis=0)
-    df = proteins.join(fasta_df)
+    df = pd.merge(fasta_df, proteins, on="Protein")
+    df = df.set_index("Protein")
     df = df.drop(columns=["Sequence"])
     df = df.apply(mass_norm, axis=1)
     df = df.drop(columns=["Mass"])
@@ -35,26 +35,17 @@ def normalize_values(proteins: pd.DataFrame, fasta: Path):
     return df
 
 
-def read_fasta(fasta: Path):
-    """Read a fasta file into a dataframe with relevant columns
+def normalize_values(proteins, fasta):
+    """Backward-compatible alias for normalize."""
+    return normalize(proteins, fasta)
 
-    Parameters
-    ----------
-    fasta : Path
-        Use the FASTA file to read and generate molecular weights
 
-    Returns
-    -------
-    pandas.DataFrame
-        The fasta dataframe with relevant columns.
-    """
+def read_fasta(fasta):
+    """Read FASTA file into a dataframe of sequences and masses."""
     fasta_df = []
     for entry in SeqIO.parse(open(fasta), "fasta"):
         name = entry.id.split("|")[1]
-        try:
-            mass = SeqUtils.molecular_weight(entry.seq, seq_type="protein")
-        except:
-            logger.warning("Ambiguous peptide in {}".format(name))
+        mass = SeqUtils.molecular_weight(entry.seq, seq_type="protein")
         temp = pd.DataFrame(
             {"Protein": name, "Sequence": str(entry.seq), "Mass": mass},
             index=[0],
@@ -66,11 +57,11 @@ def read_fasta(fasta: Path):
 
 
 def col_norm(col):
-    """Calculate the ratio of protein/total protein"""
+    """Calculate the ratio of protein/total protein."""
     return col / col.sum()
 
 
 def mass_norm(row):
-    """Do mass part of normalization"""
+    """Do mass part of normalization."""
     mass = row.loc["Mass"]
     return row / mass

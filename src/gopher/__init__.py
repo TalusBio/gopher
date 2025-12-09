@@ -6,7 +6,7 @@ try:
     try:
         __version__ = version(__name__)
     except PackageNotFoundError:
-        pass
+        __version__ = None
 
 except ImportError:
     from pkg_resources import DistributionNotFound, get_distribution
@@ -14,17 +14,14 @@ except ImportError:
     try:
         __version__ = get_distribution(__name__).version
     except DistributionNotFound:
-        pass
+        __version__ = None
 
-from .annotations import generate_annotations, load_annotations
+from . import graph_search
 from .config import get_data_dir, set_data_dir
-from .display_data import (
-    get_annotations,
-    get_rankings,
-    in_term,
-    map_proteins,
-    roc,
-)
 from .enrichment import test_enrichment
-from .normalize import normalize_values
-from .parsers import read_encyclopedia, read_metamorpheus, read_diann
+from .parsers import read_diann, read_encyclopedia, read_metamorpheus
+from .version import _get_version
+
+# Fall back to version helper if metadata lookup failed
+if __version__ is None:
+    __version__ = _get_version()

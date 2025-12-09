@@ -19,5 +19,5 @@ pip install gopher-enrich
 ```python
 import gopher                                   # import the package
 
-gopher.test_enrichment(proteins=protein_quant)  # run the enrichment 
+gopher.test_enrichment(proteins=protein_quant)  # run the enrichment
 ```

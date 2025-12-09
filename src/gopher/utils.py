@@ -1,4 +1,4 @@
-"""Utility functions"""
+"""Utility functions."""
 
 import socket
 from pathlib import Path
@@ -6,7 +6,7 @@ from pathlib import Path
 import requests
 
 
-def http_download(url: str, path: Path):
+def http_download(url, path):
     """Download a file using GET.
 
     Parameters
@@ -15,6 +15,7 @@ def http_download(url: str, path: Path):
         The URL of the file to download.
     path : Path
         The downloaded file path.
+
     """
     path = Path(path)
     with requests.get(url, stream=True) as res:
@@ -25,9 +26,9 @@ def http_download(url: str, path: Path):
                     out_ref.write(chunk)
 
         except (
+            TimeoutError,
             ConnectionRefusedError,
             ConnectionResetError,
-            socket.timeout,
             socket.gaierror,
             socket.herror,
             EOFError,
