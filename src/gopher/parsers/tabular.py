@@ -1,10 +1,10 @@
 """Parse tabular result files from common tools."""
 
-from io import StringIO
-from pathlib import Path
+import io
+import os
 
 import pandas as pd
-from cloudpathlib import CloudPath
+from cloudpathlib import AnyPath
 
 
 def read_encyclopedia(proteins_txt: str) -> pd.DataFrame:
@@ -41,6 +41,7 @@ def read_metamorpheus(proteins_txt: str) -> pd.DataFrame:
     Returns
     -------
     pandas.DataFrame
+        The Metamorpheus results in a format for gopher.
 
     """
     proteins = pd.read_table(proteins_txt, low_memory=False)
@@ -60,50 +61,68 @@ def read_metamorpheus(proteins_txt: str) -> pd.DataFrame:
     return proteins
 
 
-def _load_table(path: str) -> pd.DataFrame:
-    """Load a DIANN-style TSV from local or cloud storage."""
-    path_str = str(path)
-    cloud_prefixes = ("s3://", "gs://", "az://", "http://", "https://")
-    if path_str.startswith(cloud_prefixes):
-        cp = CloudPath(path_str)
-        text = cp.read_text()
-        return pd.read_csv(StringIO(text), sep="\t")
+def _read_colnames(file: os.PathLike | io.TextIOBase) -> list[str]:
+    with open(AnyPath(file)) as f:
+        firstcol = f.readline()
 
-    return pd.read_csv(Path(path_str), sep="\t")
+    return firstcol.strip().split("\t")
 
 
-def read_diann(path: str) -> pd.DataFrame:
-    """Read DIA-NN protein report.
+def read_diann(proteins_tsv: os.PathLike) -> pd.DataFrame:
+    """Reads a DIANN-generated TSV file (pg_matrix).
+
+    Also processes it, and returns a cleaned Pandas DataFrame.
+
+    The function:
+    - Extracts the first protein accession from the "Protein.Ids" column to use
+        as the DataFrame index.
+    - Renames the index axis to "Protein".
+    - Drops unnecessary metadata columns.
 
     Parameters
     ----------
-    path : str
-        Local path or S3 URL to a DIA-NN `*.pg_mat.tsv` report.
+    proteins_tsv : os.PathLike
+        Path to the DIANN-generated TSV file.
+        Expected columns:
+            'Protein.Group',
+            'Protein.Ids',
+            'Protein.Names',
+            'Genes',
+            'First.Protein.Description',
+            <several Intensity columns>
 
     Returns
     -------
-    pandas.DataFrame
-        DataFrame indexed by Protein accession with only intensity columns.
-
-    Raises
-    ------
-    ValueError
-        If required intensity columns are not present.
+    pd.DataFrame: A DataFrame with the processed protein data, indexed by
+        the first protein accession.
+        The returned DataFrame has the "Protein.Ids" column as the
+        index and all columns are the MSR columns.
 
     """
-    proteins = _load_table(path)
+    columns = _read_colnames(proteins_tsv)
 
-    intensity_cols = [
-        c for c in proteins.columns if c.startswith("Intensity.")
+    expect = [
+        "Protein.Group",
+        "Protein.Ids",
+        "Protein.Names",
+        "Genes",
+        "First.Protein.Description",
     ]
-    if not intensity_cols or "Protein.Ids" not in proteins.columns:
-        raise ValueError(
-            "Expected columns beginning with 'Intensity.' and 'Protein.Ids' "
-            "in DIA-NN report."
-        )
 
-    accessions = proteins["Protein.Ids"].str.split(";").str[0]
-    accessions.name = "Protein"
-    proteins = proteins.set_index(accessions)
-    proteins = proteins[intensity_cols].apply(pd.to_numeric).astype(float)
+    if not all(c in columns for c in expect):
+        msg = f"Expected columns {expect}, got {columns}, make sure you are"
+        msg += " using the 'diann_report.pg_matrix.tsv' output."
+        raise ValueError(msg)
+
+    schema: dict[str, type] = {k: float for k in columns if k not in expect}
+    schema["Protein.Ids"] = str
+
+    proteins = pd.read_table(
+        AnyPath(proteins_tsv), dtype=schema, usecols=list(schema)
+    )
+    proteins["Protein.Ids"] = proteins["Protein.Ids"].str.split(";").str[0]
+
+    proteins = proteins.set_index("Protein.Ids", drop=True)
+    proteins = proteins.rename_axis("Protein", axis="index")
+
     return proteins
